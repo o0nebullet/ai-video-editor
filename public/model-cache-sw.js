@@ -213,9 +213,29 @@ function isAiMusicModelRequest(url) {
   return url.pathname.includes("/stable-audio-3-small-music-onnx/");
 }
 
+// GitHub Pages khong cap COOP/COEP nen tai lieu khong isolated -> ONNX ve
+// 1 luong. Service worker nay la controller duy nhat cua trang (them 1 SW
+// thu 2 se cuop quyen dieu khien va lam hong waitForHostMediaController),
+// nen tu chen header vao response dieu huong o day. Lan tai dau SW moi
+// dang ky, trang reload 1 lan (xem main.jsx) de header co tac dung.
+function withIsolationHeaders(response) {
+  if (response.status === 0) return response;
+  const headers = new Headers(response.headers);
+  headers.set("Cross-Origin-Opener-Policy", "same-origin");
+  headers.set("Cross-Origin-Embedder-Policy", "require-corp");
+  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 function withCacheStatus(response, status) {
   const headers = new Headers(response.headers);
   headers.set("X-Timeline-Model-Cache", status);
+  // Tai nguyen con duoi COEP require-corp can CORP moi tai duoc.
+  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -322,7 +342,7 @@ async function networkFirst(request) {
     if (response.ok) {
       cache.put(request, response.clone()).catch(() => {});
     }
-    return response;
+    return withIsolationHeaders(response);
   } catch (error) {
     const cached = await cache.match(request);
     if (cached) {
