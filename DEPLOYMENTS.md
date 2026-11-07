@@ -11,7 +11,7 @@
 | Version | Commit | Nội dung | Ngày |
 | --- | --- | --- | --- |
 | `1.0.9-ad.0` | `c713b27a` | Merge 5 tính năng AD lên fork mới nhất `c8dbe02` (gốc v1.0.9 + 52 commit) | 2026-11-07 |
-| `1.0.9-ad.1` | `f398429` | ad.0 + dịch vi Smart Frame/Lab (64 key) + hệ thống version + config 3 hang (vercel.json, Pages workflow, tách ffmpeg wasm sang R2, COOP/COEP trong model-cache SW) — trên GitHub là 10 commit lẻ (đầu nhánh `f398429`), chưa gồm `.github/workflows/pages.yml` (kẹt quyền Workflows) | 2026-11-07 |
+| `1.0.9-ad.1` | xem `version.json` | ad.0 + dịch vi Smart Frame/Lab (64 key) + hệ thống version + config 3 hang (vercel.json, Pages workflow, tách ffmpeg wasm sang R2, COOP/COEP trong model-cache SW) — code phát hành ở commit `f398429` (10 commit lẻ trên GitHub, chưa gồm `.github/workflows/pages.yml`); commit trong `version.json` là commit lúc build, nên sau mỗi lần đẩy file tài liệu nó đổi theo mà version vẫn là ad.1 | 2026-11-07 |
 
 ## Nền tảng
 
