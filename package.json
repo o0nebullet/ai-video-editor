@@ -4,13 +4,13 @@
   "private": true,
   "description": "A local-first browser AI video editor for WebGPU AI music, AI repair, voiceovers, captions, talking avatars, and deterministic export.",
   "license": "MIT",
-  "homepage": "https://video-editor.ai-creator.top/",
+  "homepage": "https://papaya-axolotl-9490bc.netlify.app/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MartinDelophy/ai-video-editor.git"
+    "url": "https://github.com/o0nebullet/ai-video-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/MartinDelophy/ai-video-editor/issues"
+    "url": "https://github.com/o0nebullet/ai-video-editor/issues"
   },
   "type": "module",
   "scripts": {

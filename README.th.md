@@ -36,7 +36,7 @@
 - **2026-11-06** — เพิ่มการส่งออกคลิปในเมนูคลิกขวาของภาพหลักและภาพซ้อน รวมถึงแถบการทำงานบนมือถือ โดยคงสื่อต้นฉบับ ความเร็ว คำบรรยาย และเสียงในช่วงเวลาของคลิป รองรับทั้ง 13 ภาษา
 - **2026-11-04** — เพิ่มภาพลายเส้นในเอฟเฟกต์ ปรับรายละเอียด ความหนา และสลับขาวดำพร้อมตัวอย่าง บันทึกภาพ PNG และวิดีโอ WebM 24 fps ที่คงการตัด ความเร็ว และเสียงต้นฉบับในสื่อของฉันโดยไม่เพิ่มอัตโนมัติ รองรับ 13 ภาษาและมือถือ แก้ไขการเล่นไทม์ไลน์ที่มีเฉพาะคลิปภาพซ้อนภาพโดยไม่มีภาพหลัก
 - **2026-11-03** — เพิ่มเมนูเดสก์ท็อป ไฟล์ แก้ไข คลิป มุมมอง และช่วยเหลือ เชื่อมกับคำสั่งตัดต่อ ตัวอย่าง พร็อกซี และความช่วยเหลือที่มีอยู่ รองรับแป้นพิมพ์และทั้ง 13 ภาษา โทรศัพท์และแท็บเล็ตยังใช้เมนูแบบกะทัดรัด แก้ไขการเลิกทำและทำซ้ำระหว่างเตรียมสื่อ การรักษาเวลาต้นฉบับเมื่อแบ่งเส้นโค้งความเร็ว และการซิงค์เสียงที่แยกออกมา กำหนดโฟกัสแป้นพิมพ์หลังเมนูแสดงผลเพื่อป้องกันโฟกัสหลุด รวมคำสั่งพร็อกซีไว้ในมุมมอง แสดงแหล่งเล่นจริง แยกการจัดการแคช เพิ่มไอคอนตามหน้าที่และแผงมือถือที่รองรับทั้ง 13 ภาษา
-ดูงานที่วางแผนไว้ใน [Roadmap](ROADMAP.md) การเปลี่ยนแปลงที่เผยแพร่แล้วใน [Releases](https://github.com/MartinDelophy/ai-video-editor/releases) และงานหรือข้อผิดพลาดใน [Issues](https://github.com/MartinDelophy/ai-video-editor/issues)
+ดูงานที่วางแผนไว้ใน [Roadmap](ROADMAP.md) การเปลี่ยนแปลงที่เผยแพร่แล้วใน [Releases](https://github.com/o0nebullet/ai-video-editor/releases) และงานหรือข้อผิดพลาดใน [Issues](https://github.com/o0nebullet/ai-video-editor/issues)
 
 ## สร้างอะไรได้บ้าง?
 
@@ -51,7 +51,7 @@
 
 Timeline Studio คือโปรแกรมตัดต่อวิดีโอ AI แบบเน้นการทำงานในเครื่อง ซึ่งทำงานบนเบราว์เซอร์ รวมไทม์ไลน์หลายแทร็กแบบ CapCut เข้ากับเสียงพากย์ AI คำบรรยายอัตโนมัติ เครื่องมือวิเคราะห์ภาพ อวตารพูดได้ และการส่งออกแบบออฟไลน์ที่ให้ผลแน่นอน
 
-[เปิดโปรแกรมตัดต่อ](https://video-editor.ai-creator.top/) · [ชมเดโม](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[เปิดโปรแกรมตัดต่อ](https://papaya-axolotl-9490bc.netlify.app/) · [ชมเดโม](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ![โปรแกรมตัดต่อ Timeline Studio](docs/screenshots/editor-timeline.png)
 
@@ -96,18 +96,18 @@ gh skill install MartinDelophy/ai-video-editor edit-timeline-studio --agent code
 - **ขั้นถัดไป:** ขยายความสามารถเรนเดอร์แบบ headless ให้ตรงกับเบราว์เซอร์ เพิ่มคำสั่ง WebMCP ที่ตรวจสอบได้ และปรับปรุงการแชร์เทมเพลตโปรเจกต์
 - **อนาคต:** เพิ่มการตรวจทานร่วมกัน ระบบส่วนขยาย และโมเดล AI ที่ผ่านการตรวจสอบในเครื่องเพิ่มเติม
 
-ร่วมกำหนดลำดับความสำคัญได้ใน [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions)
+ร่วมกำหนดลำดับความสำคัญได้ใน [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions)
 
 ## ต้องการผู้ช่วยพัฒนา
 
-ยินดีรับความช่วยเหลือด้านสื่อบนเบราว์เซอร์ WebCodecs, WebGPU/ONNX, UX ของไทม์ไลน์ การแปล การทดสอบ และเอกสาร โปรดแจ้งบั๊กที่ทำซ้ำได้ใน [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) แบ่งปันแนวคิดใน [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions) หรือส่งการแก้ไข การทดสอบ คำแปล และตัวอย่างที่มีขอบเขตชัดเจน
+ยินดีรับความช่วยเหลือด้านสื่อบนเบราว์เซอร์ WebCodecs, WebGPU/ONNX, UX ของไทม์ไลน์ การแปล การทดสอบ และเอกสาร โปรดแจ้งบั๊กที่ทำซ้ำได้ใน [Issues](https://github.com/o0nebullet/ai-video-editor/issues) แบ่งปันแนวคิดใน [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions) หรือส่งการแก้ไข การทดสอบ คำแปล และตัวอย่างที่มีขอบเขตชัดเจน
 
 ## เริ่มต้นใช้งาน
 
 ต้องใช้ Node.js 20+ และเบราว์เซอร์ Chromium รุ่นใหม่ แนะนำให้ใช้ WebGPU
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -122,7 +122,7 @@ npm run check
 
 ## การสนับสนุนและข้อเสนอแนะ
 
-หากโปรเจกต์นี้มีประโยชน์กับคุณ โปรดกด ⭐ Star หากพบปัญหา โปรด[เปิด Issue](https://github.com/MartinDelophy/ai-video-editor/issues)
+หากโปรเจกต์นี้มีประโยชน์กับคุณ โปรดกด ⭐ Star หากพบปัญหา โปรด[เปิด Issue](https://github.com/o0nebullet/ai-video-editor/issues)
 
 เข้าร่วม[ชุมชน Discord](https://discord.gg/uq2uvUTBr) ของเราเพื่อสอบถาม แบ่งปันความคิดเห็น และพูดคุยกับผู้ใช้และผู้ร่วมพัฒนาคนอื่น ๆ
 

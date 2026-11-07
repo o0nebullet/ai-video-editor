@@ -89,6 +89,10 @@ import { useDetailRestoration } from "./hooks/useDetailRestoration.js";
 import { useSmartDenoise } from "./hooks/useSmartDenoise.js";
 import { useGenerationPlugins } from "./hooks/useGenerationPlugins.js";
 import { getVisualAssetPayload, getVisualSegmentTimeline, getImageThumbnailCount, getVisualSegmentsTotal, normalizeTimedSegmentIds } from "./lib/timeline.js";
+import { createCaptionSegments } from "./lib/timeline.js";
+import { parseStoryboardText, parseStoryboardJson, storyboardTotalSeconds } from "./lib/storyboardImport.js";
+import { PROJECT_TEMPLATES } from "./lib/projectTemplates.js";
+import { createExportQueueItem } from "./lib/exportQueue.js";
 import { getVisualSourceTime, normalizeVisualTransform, removeVisualPropertyKeyframe, updateVisualSegmentPlaybackRate, upsertVisualKeyframe, upsertVisualPropertyKeyframe } from "./lib/visualEffects.js";
 import { getVisualSpeedCurveTimelineProgress, updateVisualSegmentSpeedCurve } from "./lib/visualSpeedCurve.js";
 import { getLinkedSourceAudioEnd, getLinkedSourceAudioSegments, shouldMuteEmbeddedVideoAudio, sliceSourceAudioPeaks } from "./lib/sourceAudioSync.js";
@@ -1420,6 +1424,66 @@ export function App({ hostSession = null }) {
     isAnalysisBusy: () => isEditorBusy() || webMcp.isAiRunning() || (webMcp.execution.busy || webMcp.execution.hasPending) || generationPlugins.job.running,
     isEditorBusy: () => isEditorBusy() || webMcp.isAiRunning() || (webMcp.execution.busy || webMcp.execution.hasPending) || generationPlugins.job.running });
 
+  // Nhap storyboard: 1 dong kich ban = 1 canh -> script + caption.
+  // Chi chay local, khong gui du lieu ra ngoai. Neu timeline dang co
+  // noi dung thi hoi xac nhan truoc khi ghi de, giong nut Du an moi.
+  const applyStoryboardLines = useCallback((lines, secondsPerScene) => {
+    if (!lines.length) {
+      notify("Không tìm thấy cảnh nào trong kịch bản storyboard.");
+      return;
+    }
+    const hasContent = script.trim() !== "" || visualSegments.length > 0 || audioSegments.length > 0;
+    if (hasContent && !window.confirm("Nhập storyboard sẽ thay thế kịch bản và phụ đề hiện tại. Tiếp tục?")) return;
+    const text = lines.join("\n");
+    setScript(text);
+    setCaptionSegments(createCaptionSegments(text));
+    setSelectedSegmentId("");
+    setCurrentTime(0);
+    setTimelineHorizon(storyboardTotalSeconds(lines.length, secondsPerScene));
+    setShowFileMenu(false);
+    notify(`Đã nhập storyboard: ${lines.length} cảnh.`);
+  }, [script, visualSegments.length, audioSegments.length, notify, setScript, setCaptionSegments, setSelectedSegmentId, setCurrentTime, setTimelineHorizon, setShowFileMenu]);
+
+  const handleImportStoryboardText = useCallback((text, secondsPerScene) => {
+    applyStoryboardLines(parseStoryboardText(text), secondsPerScene);
+  }, [applyStoryboardLines]);
+
+  const handleImportStoryboardFile = useCallback(async (file) => {
+    if (!file) return;
+    try {
+      const text = typeof file.text === "function" ? await file.text() : "";
+      const { lines, error } = parseStoryboardJson(text);
+      if (error === "json") {
+        notify("File JSON storyboard không đọc được. Hãy kiểm tra lại file.");
+        return;
+      }
+      if (error === "shape" || !lines.length) {
+        notify("File JSON không có cảnh storyboard (cần scenes[].dialogue).");
+        return;
+      }
+      applyStoryboardLines(lines, 10);
+    } catch {
+      notify("Không đọc được file JSON storyboard.");
+    }
+  }, [applyStoryboardLines, notify]);
+
+  // Mau dung san: kich ban mau + ti le khung + thoi luong moi canh.
+  const handleApplyTemplate = useCallback((templateId) => {
+    const template = PROJECT_TEMPLATES.find((item) => item.id === templateId);
+    if (!template) return;
+    const hasContent = script.trim() !== "" || visualSegments.length > 0 || audioSegments.length > 0;
+    if (hasContent && !window.confirm("Áp dụng mẫu sẽ thay thế kịch bản và phụ đề hiện tại. Tiếp tục?")) return;
+    const lines = parseStoryboardText(template.script);
+    setScript(template.script);
+    setCaptionSegments(createCaptionSegments(template.script));
+    setSelectedSegmentId("");
+    setCurrentTime(0);
+    setRatioId(template.ratioId);
+    setTimelineHorizon(storyboardTotalSeconds(lines.length, template.secondsPerScene));
+    setShowFileMenu(false);
+    notify(`Đã áp dụng mẫu: ${template.name}. Hãy thay [..] bằng nội dung thật.`);
+  }, [script, visualSegments.length, audioSegments.length, notify, setScript, setCaptionSegments, setSelectedSegmentId, setCurrentTime, setRatioId, setTimelineHorizon, setShowFileMenu]);
+
   const {
     activeTimelineClipDrag, audioClipPercent, displayedCaptionSegments,
     displayedCaptionTimeline, displayedVisualSegments, exportPercent, musicClipPercent, musicStartPercent,
@@ -1487,6 +1551,43 @@ export function App({ hostSession = null }) {
       setClipExportBatch(null);
     }
   };
+  // Hang doi xuat: xuat lan luot tung lenh cho timeline hien tai, moi lenh
+  // chi doi cai dat xuat. Khong doi timeline giua chung de tranh mat du lieu.
+  const [exportQueue, setExportQueue] = useState([]);
+  const [exportQueueRunning, setExportQueueRunning] = useState(false);
+  const addExportQueueItem = useCallback((presetId) => {
+    setExportQueue((current) => [...current, createExportQueueItem(presetId)]);
+  }, []);
+  const removeExportQueueItem = useCallback((itemId) => {
+    setExportQueue((current) => current.filter((item) => item.id !== itemId));
+  }, []);
+  const clearExportQueue = useCallback(() => {
+    setExportQueue([]);
+  }, []);
+  const runExportQueue = useCallback(async () => {
+    if (exportQueueRunning || exportQueue.length === 0) return;
+    setExportQueueRunning(true);
+    let doneCount = 0;
+    try {
+      for (const item of exportQueue) {
+        setExportQueue((current) => current.map((entry) => (entry.id === item.id ? { ...entry, status: "running" } : entry)));
+        const result = await handleExportVideo({ settings: { ...exportSettings, ...item.settings } });
+        if (result?.status === "success") {
+          doneCount += 1;
+          setExportQueue((current) => current.map((entry) => (entry.id === item.id ? { ...entry, status: "done" } : entry)));
+        } else {
+          setExportQueue((current) => current.map((entry) => (entry.id === item.id ? { ...entry, status: "error" } : entry)));
+          notify(`Hàng đợi xuất dừng tại ${item.name} (không thành công).`);
+          break;
+        }
+      }
+      if (doneCount === exportQueue.length && doneCount > 0) {
+        notify(`Đã xuất xong ${doneCount} video trong hàng đợi.`);
+      }
+    } finally {
+      setExportQueueRunning(false);
+    }
+  }, [exportQueue, exportQueueRunning, exportSettings, handleExportVideo, notify]);
   const { startCaptionResize, startTimelineClipDrag } = createTimelineReorderControls({
     timelineMarkers,
     audioSegments, captionSegments, captionTargetDuration, commitCaptionSegments, commitVisualSegments, setAudioSegments,
@@ -1718,6 +1819,15 @@ export function App({ hostSession = null }) {
         handleNewProject={completeProject ? () => { void completeProject.newProject(); } : handleNewProject}
         handleExportProject={handleExportProject}
         handleImportProject={completeProject ? completeProject.importPortable : handleImportProject}
+        handleImportStoryboardText={handleImportStoryboardText}
+        handleImportStoryboardFile={handleImportStoryboardFile}
+        handleApplyTemplate={handleApplyTemplate}
+        exportQueue={exportQueue}
+        exportQueueRunning={exportQueueRunning}
+        addExportQueueItem={addExportQueueItem}
+        removeExportQueueItem={removeExportQueueItem}
+        clearExportQueue={clearExportQueue}
+        runExportQueue={runExportQueue}
         projectFileInputRef={projectFileInputRef}
       />
 

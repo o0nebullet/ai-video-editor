@@ -1,6 +1,7 @@
 import { AUTOMATIC_CAPTION_MODEL_ID, AUTOMATIC_CAPTION_MODEL_LABEL, AUTOMATIC_CAPTION_MODEL_REVISION } from "../config/models.js";
 import { makeId } from "./timeline.js";
 import { captionSegmentsFromWords } from "./captionSegmentation.js";
+import { applyCustomVocabulary } from "./customVocabulary.js";
 
 const ASR_SAMPLE_RATE = 16000;
 const LANGUAGE_DETECTION_SECONDS = 20;
@@ -114,7 +115,9 @@ function normalizeChineseAsrText(text) {
 
 function normalizeAsrText(text, language) {
   const normalized = normalizeAsrWhitespace(text, language);
-  return language === "zh" ? normalizeChineseAsrText(normalized) : normalized;
+  const withLanguageFixes = language === "zh" ? normalizeChineseAsrText(normalized) : normalized;
+  // Tu rieng cua AD (Cai dat) chi sua phu de tu dong, khong sua phu de nhap tay.
+  return applyCustomVocabulary(withLanguageFixes);
 }
 
 function normalizeTokenId(value) {

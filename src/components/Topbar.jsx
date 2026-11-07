@@ -28,7 +28,7 @@ import {
   CaretDown,
   CircleNotch,
   Database,
-  DiscordLogo,
+  FileArrowDown,
   FileArrowUp,
   FilePlus,
   FilmSlate,
@@ -38,29 +38,27 @@ import {
   MusicNotes,
   Package,
   GearSix,
-  GithubLogo,
+  ListBullets,
   Pause,
   Play,
   ShieldCheck,
   SlidersHorizontal,
   X,
-  XLogo,
 } from "@phosphor-icons/react";
 
 import { RATIO_OPTIONS } from "../config/editor.js";
 import { LocalProjectNameDialog } from "./LocalProjectNameDialog.jsx";
 import { hostText } from "../i18nHost.js";
 import { APP_LANGUAGES, saveLanguagePreference } from "../i18n.js";
+import { loadCustomVocabularyText, saveCustomVocabularyText } from "../lib/customVocabulary.js";
+import { PROJECT_TEMPLATES } from "../lib/projectTemplates.js";
+import { AI_CHAT_PROMPT_TYPES, buildAiChatPrompt } from "../lib/aiChatPrompts.js";
+import { EXPORT_QUEUE_PRESETS } from "../lib/exportQueue.js";
 import { getPrimaryShortcutModifier, releasePointerActivatedFocus } from "../lib/editorShortcuts.js";
 import { formatStorageBytes, inspectModelCache } from "../lib/modelCacheInspection.js";
 import { ExportSettingsPanel } from "./ExportSettingsPanel.jsx";
 import { IconButton, Popover } from "./ui.jsx";
 
-const COMMUNITY_LINKS = Object.freeze({
-  discord: "https://discord.gg/uq2uvUTBr",
-  github: "https://github.com/MartinDelophy/ai-video-editor",
-  x: "https://x.com/delophy37406",
-});
 
 export function Topbar({
   proxySource = "",
@@ -103,6 +101,15 @@ export function Topbar({
   handleNewProject,
   handleExportProject,
   handleImportProject,
+  handleImportStoryboardText,
+  handleImportStoryboardFile,
+  handleApplyTemplate,
+  exportQueue,
+  exportQueueRunning,
+  addExportQueueItem,
+  removeExportQueueItem,
+  clearExportQueue,
+  runExportQueue,
   projectFileInputRef,
 }) {
   useSyncExternalStore(subscribeVideoProxy, getVideoProxyRevision);
@@ -129,6 +136,18 @@ export function Topbar({
   const settingsAnchorRef = useRef(null);
   const modelCacheControlRef = useRef(null);
   const [modelCacheInspection, setModelCacheInspection] = useState({ state: "idle", result: null });
+  const [showStoryboardDialog, setShowStoryboardDialog] = useState(false);
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [showAiChatDialog, setShowAiChatDialog] = useState(false);
+  const [showExportQueueDialog, setShowExportQueueDialog] = useState(false);
+  const [exportQueuePreset, setExportQueuePreset] = useState("mp4-1080");
+  const [aiChatType, setAiChatType] = useState("script");
+  const [aiChatTopic, setAiChatTopic] = useState("");
+  const [aiChatResult, setAiChatResult] = useState("");
+  const [storyboardText, setStoryboardText] = useState("");
+  const [storyboardSeconds, setStoryboardSeconds] = useState(10);
+  const [customVocabText, setCustomVocabText] = useState(() => loadCustomVocabularyText());
+  const storyboardFileInputRef = useRef(null);
   const shortcutModifier = getPrimaryShortcutModifier();
   const shortcutRows = [
     ["markersAdd", "M"],
@@ -236,7 +255,6 @@ export function Topbar({
     { id: "help", label: t("desktopHelp"), items: [
       { key: "desktopGuide", icon: BookOpen, href: "/how-it-works/", external: true },
       item("desktopShortcuts", () => { setShowSettings(true); setShortcutRequest(value => value + 1); }),
-      { key: "desktopFeedback", icon: Bug, href: "https://github.com/MartinDelophy/ai-video-editor/issues", external: true }, null,
       { key: "desktopAbout", icon: Info, href: "/features/", external: true },
     ] },
   ];
@@ -335,6 +353,29 @@ export function Topbar({
                       <button role="menuitem" className="file-menu-action" type="button" disabled={!imageSrc || exporting} onClick={() => { setShowFileMenu(false); setShowExportMenu(true); }}><span className="file-menu-icon"><FilmSlate size={17} /></span><span className="file-menu-copy"><strong>{t("exportVideo")}</strong></span></button>
                     </div>
                     <div className="file-menu-divider" />
+                    <button className="file-menu-action" type="button" onClick={() => { setShowFileMenu(false); setShowStoryboardDialog(true); }}>
+                      <span className="file-menu-icon"><ListBullets size={17} /></span>
+                      <span className="file-menu-copy"><strong>{t("importStoryboardScript", "Nhập kịch bản storyboard")}</strong><small>{t("importStoryboardScriptHint", "Dán thoại, 1 dòng = 1 cảnh")}</small></span>
+                    </button>
+                    <button className="file-menu-action" type="button" onClick={() => { setShowFileMenu(false); setShowTemplateDialog(true); }}>
+                      <span className="file-menu-icon"><ListBullets size={17} /></span>
+                      <span className="file-menu-copy"><strong>{t("projectTemplates", "Mẫu dựng sẵn")}</strong><small>{t("projectTemplatesHint", "Short, video dài, video bán hàng")}</small></span>
+                    </button>
+                    <button className="file-menu-action" type="button" onClick={() => { setShowFileMenu(false); setShowAiChatDialog(true); }}>
+                      <span className="file-menu-icon"><ListBullets size={17} /></span>
+                      <span className="file-menu-copy"><strong>{t("aiChat", "Chat AI — Viết kịch bản")}</strong><small>{t("aiChatHint", "Copy prompt sang chat của AD, dán kết quả lại")}</small></span>
+                    </button>
+                    <button className="file-menu-action" type="button" onClick={() => { setShowFileMenu(false); setShowExportQueueDialog(true); }}>
+                      <span className="file-menu-icon"><FileArrowDown size={17} /></span>
+                      <span className="file-menu-copy"><strong>{t("exportQueue", "Hàng đợi xuất")}</strong><small>{t("exportQueueHint", "Xếp nhiều lệnh xuất, xuất 1 lượt")}</small></span>
+                    </button>
+                    <div className="file-menu-divider" />
+                    <button className="file-menu-action" type="button" onClick={() => { setShowFileMenu(false); storyboardFileInputRef.current?.click(); }}>
+                      <span className="file-menu-icon"><FileArrowUp size={17} /></span>
+                      <span className="file-menu-copy"><strong>{t("importStoryboardFile", "Nhập file JSON storyboard")}</strong><small>{t("importStoryboardFileHint", "File project JSON của web storyboard")}</small></span>
+                      <span className="file-menu-format">.json</span>
+                    </button>
+                    <div className="file-menu-divider" />
                     <nav className="file-menu-resources" aria-label={t("resourceLinks")}>
                       <a href="/features/">{t("resourceFeatures")}</a>
                       <a href="/how-it-works/">{t("resourceGuide")}</a>
@@ -345,6 +386,185 @@ export function Topbar({
                 </Popover>
               ) : null}
               <input ref={projectFileInputRef} className="project-file-input" type="file" accept="application/zip,.timeline" onChange={(event) => event.target.files?.[0] && handleImportProject(event.target.files[0])} />
+              <input ref={storyboardFileInputRef} className="project-file-input" type="file" accept=".json,application/json" onChange={(event) => { const file = event.target.files?.[0]; if (file) handleImportStoryboardFile(file); event.target.value = ""; }} />
+              {showExportQueueDialog ? (
+                <Popover className="project-file-popover storyboard-import-popover" closeLabel={t("close")} onClose={() => setShowExportQueueDialog(false)}>
+                  <div className="file-menu-card">
+                    <div className="file-menu-heading">
+                      <span>{t("exportQueue", "Hàng đợi xuất")}</span>
+                    </div>
+                    <p><small>{t("exportQueueHelp", "Hàng đợi chỉ xuất timeline hiện tại, mỗi lệnh đổi 1 kiểu xuất. Muốn xuất project khác: mở project đó rồi xuất.")}</small></p>
+                    <label>
+                      <span>{t("exportQueuePreset", "Kiểu xuất")}</span>
+                      <select value={exportQueuePreset} onChange={(event) => setExportQueuePreset(event.target.value)}>
+                        {EXPORT_QUEUE_PRESETS.map((preset) => (
+                          <option value={preset.id} key={preset.id}>{preset.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      className="file-menu-action"
+                      type="button"
+                      onClick={() => addExportQueueItem(exportQueuePreset)}
+                    >
+                      <span className="file-menu-copy"><strong>{t("exportQueueAdd", "Thêm vào hàng đợi")}</strong></span>
+                    </button>
+                    {exportQueue.length === 0 ? (
+                      <p><small>{t("exportQueueEmpty", "Hàng đợi trống.")}</small></p>
+                    ) : (
+                      <div className="export-queue-list">
+                        {exportQueue.map((item, index) => (
+                          <div className="export-queue-item" key={item.id}>
+                            <span>{index + 1}. {item.name}</span>
+                            <span>{item.status === "queued" ? t("exportQueueQueued", "Chờ") : item.status === "running" ? t("exportQueueRunning", "Đang xuất…") : item.status === "done" ? t("exportQueueDone", "Xong") : t("exportQueueError", "Lỗi")}</span>
+                            <button type="button" disabled={exportQueueRunning} onClick={() => removeExportQueueItem(item.id)}>×</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      className="file-menu-action is-primary"
+                      type="button"
+                      disabled={exportQueueRunning || exportQueue.length === 0}
+                      onClick={() => { void runExportQueue(); }}
+                    >
+                      <span className="file-menu-copy"><strong>{exportQueueRunning ? t("exportQueueRunning", "Đang xuất…") : t("exportQueueRun", "Xuất tất cả")}</strong></span>
+                    </button>
+                    <button
+                      className="file-menu-action"
+                      type="button"
+                      disabled={exportQueueRunning || exportQueue.length === 0}
+                      onClick={() => clearExportQueue()}
+                    >
+                      <span className="file-menu-copy"><strong>{t("exportQueueClear", "Xóa hàng đợi")}</strong></span>
+                    </button>
+                  </div>
+                </Popover>
+              ) : null}
+              {showAiChatDialog ? (
+                <Popover className="project-file-popover storyboard-import-popover" closeLabel={t("close")} onClose={() => setShowAiChatDialog(false)}>
+                  <div className="file-menu-card">
+                    <div className="file-menu-heading">
+                      <span>{t("aiChat", "Chat AI — Viết kịch bản")}</span>
+                    </div>
+                    <p><small>{t("aiChatPrivacy", "App không gửi dữ liệu cho AI. AD copy prompt bên dưới sang chat của AD, rồi dán kết quả vào ô cuối.")}</small></p>
+                    <label>
+                      <span>{t("aiChatType", "Loại nội dung")}</span>
+                      <select value={aiChatType} onChange={(event) => setAiChatType(event.target.value)}>
+                        {AI_CHAT_PROMPT_TYPES.map((type) => (
+                          <option value={type.id} key={type.id}>{type.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      <span>{t("aiChatTopic", "Chủ đề / sản phẩm")}</span>
+                      <input
+                        type="text"
+                        value={aiChatTopic}
+                        onChange={(event) => setAiChatTopic(event.target.value)}
+                        placeholder={t("aiChatTopicPlaceholder", "Ví dụ: Mousse 377+ INVANNCHY")}
+                      />
+                    </label>
+                    <label>
+                      <span>{t("aiChatPrompt", "Prompt để copy sang chat")}</span>
+                      <textarea
+                        className="storyboard-import-textarea"
+                        rows={4}
+                        readOnly
+                        value={buildAiChatPrompt(aiChatType, aiChatTopic)}
+                      />
+                    </label>
+                    <button
+                      className="file-menu-action"
+                      type="button"
+                      onClick={async () => {
+                        const prompt = buildAiChatPrompt(aiChatType, aiChatTopic);
+                        try {
+                          if (navigator.clipboard?.writeText) {
+                            await navigator.clipboard.writeText(prompt);
+                            notify(t("aiChatCopied", "Đã copy prompt."));
+                          } else {
+                            throw new Error("no-clipboard");
+                          }
+                        } catch {
+                          notify(t("aiChatCopyFailed", "Không copy được. Hãy bôi đen prompt và bấm Ctrl+C."));
+                        }
+                      }}
+                    >
+                      <span className="file-menu-copy"><strong>{t("aiChatCopy", "Copy prompt")}</strong></span>
+                    </button>
+                    <label>
+                      <span>{t("aiChatResult", "Dán kết quả từ chat")}</span>
+                      <textarea
+                        className="storyboard-import-textarea"
+                        rows={6}
+                        value={aiChatResult}
+                        onChange={(event) => setAiChatResult(event.target.value)}
+                        placeholder={t("aiChatResultPlaceholder", "Dán kịch bản chat trả về, mỗi dòng 1 đoạn...")}
+                      />
+                    </label>
+                    <button
+                      className="file-menu-action is-primary"
+                      type="button"
+                      onClick={() => { handleImportStoryboardText(aiChatResult, 10); setShowAiChatDialog(false); setAiChatResult(""); }}
+                    >
+                      <span className="file-menu-copy"><strong>{t("aiChatApply", "Áp dụng làm kịch bản")}</strong></span>
+                    </button>
+                  </div>
+                </Popover>
+              ) : null}
+              {showTemplateDialog ? (
+                <Popover className="project-file-popover storyboard-import-popover" closeLabel={t("close")} onClose={() => setShowTemplateDialog(false)}>
+                  <div className="file-menu-card">
+                    <div className="file-menu-heading">
+                      <span>{t("projectTemplates", "Mẫu dựng sẵn")}</span>
+                    </div>
+                    <p><small>{t("projectTemplatesHelp", "Chọn 1 mẫu để tạo kịch bản mẫu. Hãy thay [..] bằng nội dung thật của AD trước khi xuất.")}</small></p>
+                    {PROJECT_TEMPLATES.map((template) => (
+                      <button
+                        className="file-menu-action"
+                        type="button"
+                        key={template.id}
+                        onClick={() => { handleApplyTemplate(template.id); setShowTemplateDialog(false); }}
+                      >
+                        <span className="file-menu-copy"><strong>{template.name}</strong><small>{template.hint}</small></span>
+                      </button>
+                    ))}
+                  </div>
+                </Popover>
+              ) : null}
+              {showStoryboardDialog ? (
+                <Popover className="project-file-popover storyboard-import-popover" closeLabel={t("close")} onClose={() => setShowStoryboardDialog(false)}>
+                  <div className="file-menu-card">
+                    <div className="file-menu-heading">
+                      <span>{t("importStoryboardScript", "Nhập kịch bản storyboard")}</span>
+                    </div>
+                    <p><small>{t("importStoryboardScriptHelp", "Dán thoại, mỗi dòng là 1 cảnh. Nhập xong sẽ thay thế kịch bản và phụ đề hiện tại (có hỏi xác nhận).")}</small></p>
+                    <textarea
+                      className="storyboard-import-textarea"
+                      rows={8}
+                      value={storyboardText}
+                      onChange={(event) => setStoryboardText(event.target.value)}
+                      placeholder={t("importStoryboardScriptPlaceholder", "Ví dụ:\nBạn muốn làn da sạch thoáng?\nHãy thử ngay Mousse 377+...")}
+                    />
+                    <label>
+                      <span>{t("importStoryboardSceneSeconds", "Thời lượng mỗi cảnh")}</span>
+                      <select value={storyboardSeconds} onChange={(event) => setStoryboardSeconds(Number(event.target.value))}>
+                        <option value={5}>5 giây</option>
+                        <option value={10}>10 giây</option>
+                        <option value={20}>20 giây</option>
+                      </select>
+                    </label>
+                    <button
+                      className="file-menu-action is-primary"
+                      type="button"
+                      onClick={() => { handleImportStoryboardText(storyboardText, storyboardSeconds); setShowStoryboardDialog(false); setStoryboardText(""); }}
+                    >
+                      <span className="file-menu-copy"><strong>{t("importStoryboardConfirm", "Nhập storyboard")}</strong></span>
+                    </button>
+                  </div>
+                </Popover>
+              ) : null}
             </div>
             <DesktopMenus menus={menus} activeMenu={activeMenu} onOpen={openMenu} onClose={closeDesktopMenu} t={t} />
               <div className="menu-anchor" ref={proxyCacheAnchor}>
@@ -417,35 +637,7 @@ export function Topbar({
 
       <div className="topbar-actions">
         {hostService}
-        <nav className="topbar-community-links" aria-label={t("communityLinks", "社区链接")}>
-          <a
-            href={COMMUNITY_LINKS.discord}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={t("discordCommunity", "Discord 社区")}
-            title={t("discordCommunity", "Discord 社区")}
-          >
-            <DiscordLogo size={19} weight="fill" aria-hidden="true" />
-          </a>
-          <a
-            href={COMMUNITY_LINKS.github}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={t("githubRepository", "GitHub 仓库")}
-            title={t("githubRepository", "GitHub 仓库")}
-          >
-            <GithubLogo size={19} weight="fill" aria-hidden="true" />
-          </a>
-          <a
-            href={COMMUNITY_LINKS.x}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={t("xProfile", "X 个人主页")}
-            title={t("xProfile", "X 个人主页")}
-          >
-            <XLogo size={19} weight="fill" aria-hidden="true" />
-          </a>
-        </nav>
+
         <button className="preview-button" type="button" title={`${t("shortcutPlayPause")} · Space`} onClick={(event) => { handlePlayToggle(); releasePointerActivatedFocus(event); }}>
           {isPlaying ? <Pause size={16} weight="fill" /> : <Play size={16} weight="fill" />}
           <span>{t("preview")}</span>
@@ -501,6 +693,17 @@ export function Topbar({
                       </option>
                     ))}
                   </select>
+                </label>
+                <label>
+                  <span>{t("customVocab", "Từ riêng cho phụ đề")}</span>
+                  <textarea
+                    className="custom-vocab-textarea"
+                    rows={4}
+                    value={customVocabText}
+                    onChange={(event) => { setCustomVocabText(event.target.value); saveCustomVocabularyText(event.target.value); }}
+                    placeholder={t("customVocabPlaceholder", "Mỗi dòng 1 quy tắc: sai -> đúng\nVí dụ:\nin van chi -> INVANNCHY")}
+                  />
+                  <small>{t("customVocabHelp", "Chỉ sửa phụ đề tự động tạo ra, không sửa phụ đề nhập tay.")}</small>
                 </label>
                 <label>
                   <input

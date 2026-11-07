@@ -2,9 +2,9 @@
 
 This roadmap lists public, user-facing work that is planned or currently in development. It is intentionally separate from the release history:
 
-- [GitHub Releases](https://github.com/MartinDelophy/ai-video-editor/releases) records features that have shipped.
+- [GitHub Releases](https://github.com/o0nebullet/ai-video-editor/releases) records features that have shipped.
 - This roadmap records what is being explored, implemented, or polished next.
-- [GitHub Issues](https://github.com/MartinDelophy/ai-video-editor/issues) is the place for reproducible bugs and focused implementation discussions.
+- [GitHub Issues](https://github.com/o0nebullet/ai-video-editor/issues) is the place for reproducible bugs and focused implementation discussions.
 
 Last updated: July 29, 2026.
 
@@ -36,7 +36,7 @@ Last updated: July 29, 2026.
 
 ## Contribution guidance
 
-Before starting a large item, open a [GitHub Discussion](https://github.com/MartinDelophy/ai-video-editor/discussions) or a focused issue describing:
+Before starting a large item, open a [GitHub Discussion](https://github.com/o0nebullet/ai-video-editor/discussions) or a focused issue describing:
 
 1. the user workflow;
 2. desktop and mobile behavior;

@@ -1,0 +1,12 @@
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Resource-Policy: same-origin
+/.well-known/agent-skills/index.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+/agent-guide.md
+  Content-Type: text/markdown; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff

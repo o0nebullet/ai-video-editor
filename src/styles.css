@@ -339,6 +339,79 @@ button:disabled {
   left: 0;
 }
 
+/* Hop nhap kich ban storyboard: rong hon menu file de dan thoai. */
+.storyboard-import-popover .file-menu-card {
+  width: 360px;
+}
+.storyboard-import-textarea,
+.custom-vocab-textarea {
+  width: 100%;
+  min-height: 140px;
+  resize: vertical;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px;
+  color: #eef4f6;
+  background: rgba(255, 255, 255, 0.05);
+  font: inherit;
+  line-height: 1.5;
+}
+.custom-vocab-textarea {
+  min-height: 80px;
+}
+.storyboard-import-popover .file-menu-card label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px;
+  color: #c7d2d9;
+  font-size: 12px;
+}
+.storyboard-import-popover .file-menu-card label select {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 4px 6px;
+  color: #eef4f6;
+  background: #171b22;
+}
+.storyboard-import-popover .file-menu-card input[type="text"] {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #eef4f6;
+  background: rgba(255, 255, 255, 0.05);
+  font: inherit;
+}
+.export-queue-list {
+  display: grid;
+  gap: 4px;
+}
+.export-queue-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #c7d2d9;
+  font-size: 12px;
+}
+.export-queue-item button {
+  border: 0;
+  background: transparent;
+  color: #aeb8c2;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+.export-queue-item button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
 .popover-close {
   position: absolute;
   top: 8px;

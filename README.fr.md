@@ -36,7 +36,7 @@ L’utilisateur assume seul toute responsabilité juridique découlant du non-re
 - **2026-11-06** — Ajout de l’export de clips aux menus contextuels des visuels et superpositions et aux actions mobiles, avec médias originaux, vitesses, sous-titres et audio sur l’intervalle du clip. Disponible dans les 13 langues.
 - **2026-11-04** — Ajout du Dessin au trait dans les effets : détail, épaisseur, inversion et aperçu. Les images PNG et vidéos WebM à 24 fps conservant découpage, vitesse et son source sont enregistrées dans Mes ressources sans insertion automatique. Compatible avec les 13 langues et le mobile. Correction de la lecture des timelines contenant uniquement des incrustations.
 - **2026-11-03** — Ajout des menus de bureau Fichier, Édition, Clip, Affichage et Aide, reliés aux actions existantes de montage, d’aperçu, de proxies et d’aide, avec navigation au clavier et les 13 langues. Les téléphones et tablettes conservent les menus compacts. Correction de l’annulation pendant la préparation, des temps source lors du découpage des courbes de vitesse et de la synchronisation audio séparée. Le focus clavier est attribué après le montage du menu déroulant. Les commandes de proxy sont regroupées dans Affichage, avec la source de lecture réelle, une gestion séparée du cache, des icônes distinctes et un panneau mobile dans les 13 langues.
-Consultez la [Roadmap](ROADMAP.md) pour les travaux prévus, les [Releases](https://github.com/MartinDelophy/ai-video-editor/releases) pour les changements publiés et les [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) pour les tâches et anomalies.
+Consultez la [Roadmap](ROADMAP.md) pour les travaux prévus, les [Releases](https://github.com/o0nebullet/ai-video-editor/releases) pour les changements publiés et les [Issues](https://github.com/o0nebullet/ai-video-editor/issues) pour les tâches et anomalies.
 
 ## Que peut-il produire ?
 
@@ -51,7 +51,7 @@ Découvrez des exemples avant/après reproductibles et des recettes de montage :
 
 Timeline Studio est un éditeur vidéo IA local qui fonctionne dans le navigateur. Il associe une timeline multipiste inspirée de CapCut à la synthèse vocale, aux sous-titres automatiques, aux outils de vision, aux avatars parlants et à un export hors ligne déterministe.
 
-[Ouvrir l’éditeur](https://video-editor.ai-creator.top/) · [Voir la démo](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[Ouvrir l’éditeur](https://papaya-axolotl-9490bc.netlify.app/) · [Voir la démo](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ![Éditeur Timeline Studio](docs/screenshots/editor-timeline.png)
 
@@ -96,18 +96,18 @@ Ajoutez `--pin v1.0.8` pour installer la version vérifiée plutôt que de suivr
 - **Ensuite :** étendre la parité du rendu headless, les commandes WebMCP vérifiables et le partage de modèles de projet.
 - **Plus tard :** ajouter la révision collaborative, une interface d’extension et davantage de modèles IA validés localement.
 
-Les priorités sont discutées dans [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions).
+Les priorités sont discutées dans [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions).
 
 ## Contributions recherchées
 
-Nous recherchons de l’aide sur les médias web, WebCodecs, WebGPU/ONNX, l’UX de la timeline, la localisation, les tests et la documentation. Signalez les bugs reproductibles dans [Issues](https://github.com/MartinDelophy/ai-video-editor/issues), partagez vos idées dans [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions), ou proposez des correctifs, tests, traductions et exemples ciblés.
+Nous recherchons de l’aide sur les médias web, WebCodecs, WebGPU/ONNX, l’UX de la timeline, la localisation, les tests et la documentation. Signalez les bugs reproductibles dans [Issues](https://github.com/o0nebullet/ai-video-editor/issues), partagez vos idées dans [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions), ou proposez des correctifs, tests, traductions et exemples ciblés.
 
 ## Démarrage rapide
 
 Node.js 20+ et un navigateur Chromium récent sont requis. WebGPU est recommandé.
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -122,7 +122,7 @@ npm run check
 
 ## Soutien et retours
 
-Si ce projet vous est utile, n'hésitez pas à lui attribuer une ⭐ Star. Si vous rencontrez un problème, [ouvrez une Issue](https://github.com/MartinDelophy/ai-video-editor/issues).
+Si ce projet vous est utile, n'hésitez pas à lui attribuer une ⭐ Star. Si vous rencontrez un problème, [ouvrez une Issue](https://github.com/o0nebullet/ai-video-editor/issues).
 
 Rejoignez notre [communauté Discord](https://discord.gg/uq2uvUTBr) pour poser des questions, partager vos retours et échanger avec d’autres utilisateurs et contributeurs.
 

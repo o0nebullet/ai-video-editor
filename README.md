@@ -2,8 +2,8 @@
 
 **English** | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt-BR.md) | [ไทย](README.th.md) | [Tiếng Việt](README.vi.md) | [Русский](README.ru.md)
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Timeline_Studio-35ead9?style=flat-square)](https://video-editor.ai-creator.top/)
-[![MIT License](https://img.shields.io/github/license/MartinDelophy/ai-video-editor?style=flat-square)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Timeline_Studio-35ead9?style=flat-square)](https://papaya-axolotl-9490bc.netlify.app/)
+[![MIT License](https://img.shields.io/github/license/o0nebullet/ai-video-editor?style=flat-square)](LICENSE)
 [![skills.sh](https://skills.sh/b/MartinDelophy/ai-video-editor)](https://skills.sh/MartinDelophy/ai-video-editor)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md) [![LINUX DO](https://shorturl.at/ggSqS)](https://linux.do)
 <a href="https://toolindex.net/tools/timeline-studio?ref=badge" target="_blank" rel="noopener">
@@ -47,7 +47,7 @@ Users are solely responsible for any legal liability arising from violations of 
 - **2026-11-06** — Added Export clip to Visuals and Overlay context menus and mobile clip actions. Exports the clip’s timeline interval with the current composition, original media, speed mapping, captions and audio; includes all 13 interface languages.
 - **2026-11-04** — Added Line art beside Depth map in Effects: adjustable detail, line weight and inversion with a live preview. Images become PNG assets and trimmed/speed-mapped videos become 24 fps WebM assets with source audio, saved to My assets without automatic insertion. Includes all 13 interface languages and mobile controls. Fixed playback when only picture-in-picture clips remain on the timeline.
 - **2026-11-03** — Added desktop File, Edit, Clip, View and Help menus wired to existing editing, preview, proxy and help actions, with keyboard navigation and all 13 interface languages. Phones and tablets retain the compact menu layout. Fixed undo/redo during media preparation, source-time preservation when splitting speed curves, and separated-audio playback synchronization. Keyboard menu focus is now assigned after the dropdown mounts. Proxy controls now live in View, with actual playback-source status, separate cache management, distinct icons across every menu, and a mobile sheet localized in all 13 languages.
-See the public [Roadmap](ROADMAP.md) for planned work, [Releases](https://github.com/MartinDelophy/ai-video-editor/releases) for shipped changes, and [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) for focused tasks and bugs.
+See the public [Roadmap](ROADMAP.md) for planned work, [Releases](https://github.com/o0nebullet/ai-video-editor/releases) for shipped changes, and [Issues](https://github.com/o0nebullet/ai-video-editor/issues) for focused tasks and bugs.
 
 ## What can it produce?
 
@@ -62,7 +62,7 @@ Explore reproducible before/after examples and editing recipes:
 
 Timeline Studio is a local-first AI video editor that runs in the browser. It combines a CapCut-style multi-track timeline with WebGPU AI music and repair, multilingual voiceovers, automatic captions, talking-avatar generation, and deterministic offline export.
 
-[Open the editor](https://video-editor.ai-creator.top/) · [Watch on YouTube](https://youtu.be/bqKhpPPa-qo) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[Open the editor](https://papaya-axolotl-9490bc.netlify.app/) · [Watch on YouTube](https://youtu.be/bqKhpPPa-qo) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ## Video demo
 
@@ -170,14 +170,14 @@ gh skill preview MartinDelophy/ai-video-editor edit-timeline-studio
 - **Next:** expand headless render parity and the reviewed browser WebMCP command subset.
 - **Later:** add collaborative review workflows, a plugin extension surface, and more locally verified AI models.
 
-Roadmap priorities are shaped in [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions). Feature requests and real-world workflow feedback are welcome.
+Roadmap priorities are shaped in [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions). Feature requests and real-world workflow feedback are welcome.
 
 ## Help wanted
 
 Timeline Studio is looking for contributors interested in browser media, WebCodecs, WebGPU/ONNX, timeline UX, localization, testing, and documentation.
 
-- Try the [live editor](https://video-editor.ai-creator.top/) and report reproducible bugs in [Issues](https://github.com/MartinDelophy/ai-video-editor/issues).
-- Join [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions) to propose features, share projects, or help prioritize the roadmap.
+- Try the [live editor](https://papaya-axolotl-9490bc.netlify.app/) and report reproducible bugs in [Issues](https://github.com/o0nebullet/ai-video-editor/issues).
+- Join [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions) to propose features, share projects, or help prioritize the roadmap.
 - Read the [contribution guide](CONTRIBUTING.md) for setup, validation, and first-contribution guidance.
 - Contributions of focused fixes, tests, translations, documentation, and example projects are especially useful.
 
@@ -186,7 +186,7 @@ Timeline Studio is looking for contributors interested in browser media, WebCode
 Requirements: Node.js 20+ and a modern Chromium browser. WebGPU is recommended for the heaviest AI workflows.
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -217,7 +217,7 @@ npx netlify-cli deploy --prod --dir=dist
 
 ## Support and feedback
 
-If this project helps you, please consider giving it a ⭐ Star. If you encounter a problem, please [open an Issue](https://github.com/MartinDelophy/ai-video-editor/issues).
+If this project helps you, please consider giving it a ⭐ Star. If you encounter a problem, please [open an Issue](https://github.com/o0nebullet/ai-video-editor/issues).
 
 Join our [Discord community](https://discord.gg/uq2uvUTBr) to ask questions, share feedback, and connect with other users and contributors.
 

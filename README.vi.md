@@ -36,7 +36,7 @@ Người dùng tự chịu mọi trách nhiệm pháp lý phát sinh từ việc
 - **2026-11-06** — Thêm xuất đoạn phim vào menu chuột phải của hình ảnh chính, lớp phủ và thanh thao tác di động; giữ nguồn gốc, ánh xạ tốc độ, phụ đề và âm thanh trong khoảng thời gian của đoạn. Hỗ trợ đủ 13 ngôn ngữ.
 - **2026-11-04** — Thêm Hình nét trong Hiệu ứng, với chi tiết, độ dày, đảo trắng đen và xem trước. Lưu ảnh PNG và video WebM 24 fps giữ phần cắt, tốc độ và âm thanh nguồn vào Tài nguyên của tôi, không tự chèn. Hỗ trợ 13 ngôn ngữ và di động. Sửa phát dòng thời gian chỉ có đoạn hình trong hình mà không có hình chính.
 - **2026-11-03** — Thêm menu máy tính Tệp, Chỉnh sửa, Đoạn, Hiển thị và Trợ giúp, nối với các thao tác chỉnh sửa, xem trước, proxy và trợ giúp hiện có, hỗ trợ bàn phím và đủ 13 ngôn ngữ. Điện thoại và máy tính bảng giữ menu gọn. Sửa hoàn tác/làm lại khi chuẩn bị phương tiện, giữ thời gian nguồn khi cắt đường cong tốc độ và đồng bộ phát âm thanh đã tách. Đặt tiêu điểm bàn phím sau khi menu thả xuống được hiển thị. Đưa thao tác proxy vào Hiển thị, kèm nguồn phát thực tế, quản lý bộ nhớ đệm riêng, biểu tượng theo chức năng và bảng di động đủ 13 ngôn ngữ.
-Xem [Roadmap](ROADMAP.md) cho công việc dự kiến, [Releases](https://github.com/MartinDelophy/ai-video-editor/releases) cho thay đổi đã phát hành và [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) cho nhiệm vụ và lỗi.
+Xem [Roadmap](ROADMAP.md) cho công việc dự kiến, [Releases](https://github.com/o0nebullet/ai-video-editor/releases) cho thay đổi đã phát hành và [Issues](https://github.com/o0nebullet/ai-video-editor/issues) cho nhiệm vụ và lỗi.
 
 ## Có thể tạo ra những gì?
 
@@ -51,7 +51,7 @@ Khám phá các ví dụ trước/sau có thể tái lập và công thức biê
 
 Timeline Studio là trình chỉnh sửa video AI ưu tiên xử lý cục bộ và chạy trong trình duyệt. Ứng dụng kết hợp dòng thời gian nhiều rãnh kiểu CapCut với lồng tiếng AI, phụ đề tự động, công cụ thị giác, avatar biết nói và quy trình xuất ngoại tuyến xác định.
 
-[Mở trình chỉnh sửa](https://video-editor.ai-creator.top/) · [Xem bản demo](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[Mở trình chỉnh sửa](https://papaya-axolotl-9490bc.netlify.app/) · [Xem bản demo](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ![Trình chỉnh sửa Timeline Studio](docs/screenshots/editor-timeline.png)
 
@@ -96,18 +96,18 @@ Thêm `--pin v1.0.8` để cài bản phát hành đã được kiểm chứng t
 - **Tiếp theo:** mở rộng tính tương đương giữa kết xuất headless và trình duyệt, các lệnh WebMCP có thể xem xét và việc chia sẻ mẫu dự án.
 - **Sau này:** bổ sung quy trình đánh giá cộng tác, giao diện tiện ích mở rộng và thêm các mô hình AI được xác minh cục bộ.
 
-Các ưu tiên được thảo luận tại [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions).
+Các ưu tiên được thảo luận tại [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions).
 
 ## Cần sự đóng góp
 
-Chúng tôi hoan nghênh đóng góp về phương tiện trong trình duyệt, WebCodecs, WebGPU/ONNX, UX dòng thời gian, bản địa hóa, kiểm thử và tài liệu. Hãy báo lỗi có thể tái hiện trong [Issues](https://github.com/MartinDelophy/ai-video-editor/issues), chia sẻ ý tưởng tại [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions), hoặc gửi các bản sửa lỗi, kiểm thử, bản dịch và ví dụ có phạm vi rõ ràng. Xem chi tiết trong [Hướng dẫn đóng góp bằng tiếng Việt](CONTRIBUTING.vi.md).
+Chúng tôi hoan nghênh đóng góp về phương tiện trong trình duyệt, WebCodecs, WebGPU/ONNX, UX dòng thời gian, bản địa hóa, kiểm thử và tài liệu. Hãy báo lỗi có thể tái hiện trong [Issues](https://github.com/o0nebullet/ai-video-editor/issues), chia sẻ ý tưởng tại [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions), hoặc gửi các bản sửa lỗi, kiểm thử, bản dịch và ví dụ có phạm vi rõ ràng. Xem chi tiết trong [Hướng dẫn đóng góp bằng tiếng Việt](CONTRIBUTING.vi.md).
 
 ## Khởi động nhanh
 
 Yêu cầu Node.js 20+ và trình duyệt Chromium hiện đại. Khuyến nghị WebGPU.
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -122,7 +122,7 @@ npm run check
 
 ## Hỗ trợ và phản hồi
 
-Nếu dự án này hữu ích với bạn, hãy cân nhắc tặng dự án một ⭐ Star. Nếu gặp vấn đề, vui lòng [mở một Issue](https://github.com/MartinDelophy/ai-video-editor/issues).
+Nếu dự án này hữu ích với bạn, hãy cân nhắc tặng dự án một ⭐ Star. Nếu gặp vấn đề, vui lòng [mở một Issue](https://github.com/o0nebullet/ai-video-editor/issues).
 
 Hãy tham gia [cộng đồng Discord](https://discord.gg/uq2uvUTBr) để đặt câu hỏi, chia sẻ phản hồi và kết nối với những người dùng cũng như cộng tác viên khác.
 

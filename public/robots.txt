@@ -16,4 +16,4 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
-Sitemap: https://video-editor.ai-creator.top/sitemap.xml
+Sitemap: https://papaya-axolotl-9490bc.netlify.app/sitemap.xml

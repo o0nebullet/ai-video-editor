@@ -36,7 +36,7 @@
 - **2026-11-06** — В контекстные меню основного видео и наложений и мобильные действия добавлен экспорт клипа: экспортируется его временной диапазон с оригиналами, изменениями скорости, субтитрами и звуком. Поддерживаются все 13 языков.
 - **2026-11-04** — В эффекты добавлен линейный рисунок с детализацией, толщиной, инверсией и предпросмотром. PNG и WebM с частотой 24 кадра/с сохраняются в «Мои ресурсы» без автоматической вставки; видео сохраняет обрезку, скорость и исходный звук. Поддерживаются 13 языков и мобильный интерфейс. Исправлено воспроизведение таймлайна только с клипами «картинка в картинке».
 - **2026-11-03** — Добавлены настольные меню «Файл», «Правка», «Клип», «Вид» и «Справка» с существующими действиями монтажа, предпросмотра, прокси и помощи, клавиатурной навигацией и всеми 13 языками. На телефонах и планшетах сохранены компактные меню. Исправлены отмена и повтор во время подготовки медиа, сохранение исходного времени при разрезании кривых скорости и синхронизация отделённого аудио. Фокус клавиатуры назначается после появления выпадающего меню. Управление прокси перенесено в «Вид»: фактический источник воспроизведения, отдельное управление кэшем, разные значки действий и мобильная панель на всех 13 языках.
-Планируемые работы находятся в [Roadmap](ROADMAP.md), опубликованные изменения — в [Releases](https://github.com/MartinDelophy/ai-video-editor/releases), а отдельные задачи и ошибки — в [Issues](https://github.com/MartinDelophy/ai-video-editor/issues).
+Планируемые работы находятся в [Roadmap](ROADMAP.md), опубликованные изменения — в [Releases](https://github.com/o0nebullet/ai-video-editor/releases), а отдельные задачи и ошибки — в [Issues](https://github.com/o0nebullet/ai-video-editor/issues).
 
 ## Что можно создать?
 
@@ -51,7 +51,7 @@
 
 Timeline Studio — локальный ИИ-видеоредактор, работающий в браузере. Он объединяет многодорожечную временную шкалу в стиле CapCut, ИИ-озвучивание, автоматические субтитры, инструменты компьютерного зрения, говорящие аватары и детерминированный офлайн-экспорт.
 
-[Открыть редактор](https://video-editor.ai-creator.top/) · [Посмотреть демо](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[Открыть редактор](https://papaya-axolotl-9490bc.netlify.app/) · [Посмотреть демо](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ![Редактор Timeline Studio](docs/screenshots/editor-timeline.png)
 
@@ -96,18 +96,18 @@ gh skill install MartinDelophy/ai-video-editor edit-timeline-studio --agent code
 - **Далее:** расширить соответствие headless-рендеринга браузерному экспорту, набор проверяемых команд WebMCP и обмен шаблонами проектов.
 - **Позже:** добавить совместное рецензирование, интерфейс расширений и больше локально проверенных ИИ-моделей.
 
-Приоритеты обсуждаются в [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions).
+Приоритеты обсуждаются в [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions).
 
 ## Нужна помощь
 
-Приветствуются вклады в браузерные медиа, WebCodecs, WebGPU/ONNX, UX временной шкалы, локализацию, тесты и документацию. Сообщайте о воспроизводимых ошибках в [Issues](https://github.com/MartinDelophy/ai-video-editor/issues), делитесь идеями в [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions) или присылайте небольшие исправления, тесты, переводы и примеры.
+Приветствуются вклады в браузерные медиа, WebCodecs, WebGPU/ONNX, UX временной шкалы, локализацию, тесты и документацию. Сообщайте о воспроизводимых ошибках в [Issues](https://github.com/o0nebullet/ai-video-editor/issues), делитесь идеями в [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions) или присылайте небольшие исправления, тесты, переводы и примеры.
 
 ## Быстрый старт
 
 Требуются Node.js 20+ и современный браузер Chromium. Рекомендуется WebGPU.
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -122,7 +122,7 @@ npm run check
 
 ## Поддержка и обратная связь
 
-Если этот проект оказался вам полезен, поставьте ему ⭐ Star. Если вы столкнулись с проблемой, [создайте Issue](https://github.com/MartinDelophy/ai-video-editor/issues).
+Если этот проект оказался вам полезен, поставьте ему ⭐ Star. Если вы столкнулись с проблемой, [создайте Issue](https://github.com/o0nebullet/ai-video-editor/issues).
 
 Присоединяйтесь к нашему [сообществу в Discord](https://discord.gg/uq2uvUTBr), чтобы задавать вопросы, делиться отзывами и общаться с другими пользователями и участниками проекта.
 

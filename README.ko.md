@@ -36,7 +36,7 @@ Anna 버전에서 AI 편집 지원과 프로젝트 이어 작업을 경험하세
 - **2026-11-06** — 주 화면 및 오버레이 우클릭 메뉴와 모바일 작업에 클립 내보내기를 추가했습니다. 원본 미디어, 속도 매핑, 자막과 오디오를 유지하며 클립 시간 범위를 내보냅니다. 13개 인터페이스 언어를 지원합니다.
 - **2026-11-04** — 효과에 선화를 추가했습니다. 디테일, 선 두께, 흑백 반전과 미리보기를 제공합니다. 이미지는 PNG, 영상은 트리밍·속도와 원본 오디오를 유지한 24 fps WebM으로 내 에셋에 저장하며 자동 삽입하지 않습니다. 13개 언어와 모바일을 지원합니다. 주 화면 없이 화면 속 화면 클립만 있는 타임라인 재생을 수정했습니다.
 - **2026-11-03** — 데스크톱에 파일·편집·클립·보기·도움말 메뉴를 추가했습니다. 기존 편집, 미리보기, 프록시 및 도움말 기능과 연결되며 키보드 탐색과 13개 언어를 지원합니다. 휴대전화와 태블릿은 간결한 메뉴를 유지합니다. 미디어 준비 중 실행 취소·다시 실행, 속도 곡선 분할 시 원본 시간 유지, 분리된 오디오 재생 동기화를 수정했습니다. 드롭다운이 표시된 뒤 키보드 포커스를 설정하여 포커스 누락을 방지합니다. 프록시 작업을 보기 메뉴에 통합하고 실제 재생 소스, 별도 캐시 관리, 기능별 아이콘과 13개 언어를 지원하는 모바일 패널을 추가했습니다.
-계획된 작업은 [Roadmap](ROADMAP.md), 출시된 변경 사항은 [Releases](https://github.com/MartinDelophy/ai-video-editor/releases), 개별 작업과 버그는 [Issues](https://github.com/MartinDelophy/ai-video-editor/issues)에서 확인하세요.
+계획된 작업은 [Roadmap](ROADMAP.md), 출시된 변경 사항은 [Releases](https://github.com/o0nebullet/ai-video-editor/releases), 개별 작업과 버그는 [Issues](https://github.com/o0nebullet/ai-video-editor/issues)에서 확인하세요.
 
 ## 무엇을 만들 수 있나요?
 
@@ -51,7 +51,7 @@ Anna 버전에서 AI 편집 지원과 프로젝트 이어 작업을 경험하세
 
 Timeline Studio는 브라우저에서 실행되는 로컬 우선 AI 동영상 편집기입니다. CapCut 스타일의 멀티트랙 타임라인에 AI 음성, 자동 자막, 비전 도구, 말하는 아바타, 결정적 오프라인 내보내기를 결합합니다.
 
-[편집기 열기](https://video-editor.ai-creator.top/) · [데모 보기](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[편집기 열기](https://papaya-axolotl-9490bc.netlify.app/) · [데모 보기](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ![Timeline Studio 편집기](docs/screenshots/editor-timeline.png)
 
@@ -96,18 +96,18 @@ gh skill install MartinDelophy/ai-video-editor edit-timeline-studio --agent code
 - **다음:** 헤드리스 렌더링과 브라우저 출력의 기능 일치를 확대하고, 검토 가능한 WebMCP 편집 명령과 재사용 프로젝트 템플릿 공유를 개선합니다.
 - **향후:** 협업 검토 흐름, 플러그인 확장 인터페이스, 로컬에서 검증된 AI 모델 추가.
 
-우선순위는 [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions)에서 함께 정합니다.
+우선순위는 [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions)에서 함께 정합니다.
 
 ## 도움을 기다립니다
 
-브라우저 미디어, WebCodecs, WebGPU/ONNX, 타임라인 UX, 현지화, 테스트 및 문서화 기여를 환영합니다. 재현 가능한 버그는 [Issues](https://github.com/MartinDelophy/ai-video-editor/issues)에, 아이디어와 작품은 [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions)에 공유해 주세요. 작은 수정, 테스트, 번역, 예제도 큰 도움이 됩니다.
+브라우저 미디어, WebCodecs, WebGPU/ONNX, 타임라인 UX, 현지화, 테스트 및 문서화 기여를 환영합니다. 재현 가능한 버그는 [Issues](https://github.com/o0nebullet/ai-video-editor/issues)에, 아이디어와 작품은 [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions)에 공유해 주세요. 작은 수정, 테스트, 번역, 예제도 큰 도움이 됩니다.
 
 ## 빠른 시작
 
 Node.js 20+와 최신 Chromium 브라우저가 필요합니다. WebGPU를 권장합니다.
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -122,7 +122,7 @@ npm run check
 
 ## 지원 및 피드백
 
-이 프로젝트가 도움이 되었다면 ⭐ Star를 눌러 주세요. 문제가 발생하면 [Issue를 등록해 주세요](https://github.com/MartinDelophy/ai-video-editor/issues).
+이 프로젝트가 도움이 되었다면 ⭐ Star를 눌러 주세요. 문제가 발생하면 [Issue를 등록해 주세요](https://github.com/o0nebullet/ai-video-editor/issues).
 
 질문과 피드백을 공유하고 다른 사용자 및 기여자와 소통하려면 [Discord 커뮤니티](https://discord.gg/uq2uvUTBr)에 참여해 주세요.
 

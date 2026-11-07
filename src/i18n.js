@@ -3718,14 +3718,14 @@ export const LANGUAGE_FALLBACKS = {
 
 export function getStoredLanguage() {
   if (typeof window === "undefined") {
-    return "";
+    return "vi";
   }
 
   try {
     const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    return APP_LANGUAGES.some((language) => language.id === stored) ? stored : "";
+    return APP_LANGUAGES.some((language) => language.id === stored) ? stored : "vi";
   } catch {
-    return "";
+    return "vi";
   }
 }
 
