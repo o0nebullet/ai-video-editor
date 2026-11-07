@@ -1,6 +1,6 @@
 {
   "name": "web-player",
-  "version": "1.0.0",
+  "version": "1.0.9-ad.1",
   "private": true,
   "description": "A local-first browser AI video editor for WebGPU AI music, AI repair, voiceovers, captions, talking avatars, and deterministic export.",
   "license": "MIT",
@@ -16,7 +16,7 @@
   "scripts": {
     "host": "node apps/launcher/index.ts",
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "node scripts/write-version.mjs && vite build",
     "agent": "node scripts/timeline-command.mjs",
     "mcp": "node skills/edit-timeline-studio/mcp/server.mjs",
     "skill:doctor": "node skills/edit-timeline-studio/scripts/setup-host.mjs --check",
