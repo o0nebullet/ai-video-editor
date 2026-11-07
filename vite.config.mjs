@@ -13,6 +13,9 @@ const isolationHeaders = {
 };
 
 export default defineConfig({
+  // GitHub Pages chay duoi /ai-video-editor/ -> build voi VITE_BASE=/ai-video-editor/.
+  // Cac host khac de mac dinh "/".
+  base: process.env.VITE_BASE || "/",
   build: {
     rollupOptions: {
       input: {
