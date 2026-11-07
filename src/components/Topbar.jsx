@@ -1,4 +1,5 @@
 import { DesktopMenus } from "./DesktopMenus.jsx";
+import { version as appVersion } from "../../package.json";
 import { cancelVideoProxy, clearVideoProxyCache, getVideoProxyMode, getVideoProxyRecord, getVideoProxyRevision, subscribeVideoProxy, setVideoProxyMode } from "../lib/videoProxy.js";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -312,7 +313,7 @@ export function Topbar({
                   }}>
                     <div className="file-menu-heading">
                       <span>{t("projectMenuHeading")}</span>
-                      <small>Timeline Studio</small>
+                      <small>Timeline Studio · v{appVersion}</small>
                     </div>
                     <button role="menuitem" className="file-menu-action file-menu-new" type="button" onClick={() => { setShowFileMenu(false); handleNewProject(); }}>
                       <span className="file-menu-icon"><FilePlus size={17} /></span>
