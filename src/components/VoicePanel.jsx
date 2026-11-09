@@ -1474,13 +1474,7 @@ export function VoicePanel({
   setHistoryItems,
   notify,
   audioUrl,
-  audioRef,
   audioSegments,
-  audioSegmentRefs,
-  sourceAudioRef,
-  musicRef,
-  sourceAudioUrl,
-  musicUrl,
   captionSegments,
   selectedCaptionSegment,
   selectedSegmentId,
@@ -1533,6 +1527,7 @@ export function VoicePanel({
   onApplyVoiceColor,
   onRestoreVoiceColor,
   selectedVisualSegment,
+  getColorScopeSource,
   selectedStickerSegment,
   updateStickerSegment,
   deleteStickerSegment,
@@ -1645,7 +1640,7 @@ export function VoicePanel({
     background: t("effectBackground"),
     edge: t("effectEdgeCleanup"),
   }[mobileInspectorSection];
-  const title = focusedSectionTitle || (isSilenceRemovalContext ? t("pauseTitle") : isPluginsContext ? getPluginCopy(uiLanguage).title : isFaceSwapContext ? t("faceSwapTitle") : isOpticalFlowContext ? t("effectVectorTracking") : isLineArtContext ? t("lineArtTitle") : isCinematicDepthContext ? t(effectsPanelMode === "relight" ? "relightTitle" : effectsPanelMode === "depth-map" ? "depthMapTitle" : "depthTitle") : isPhotoParallaxContext ? t("parallaxTitle") : isEffectsContext ? t("effectProperties") : isAiMusicContext ? (AI_MUSIC_COPY[uiLanguage] || AI_MUSIC_COPY.en).title : isSmartAutoContext ? t("smartAutoEdit") : isSmartFrameContext ? t("smartFrame") : isAvatarContext ? t("avatarTitle") : isVectorOverlay || isVectorVisual ? t("vectorProperties", "矢量图形") : isOverlayContext ? t("pictureInPicture", "画中画") : isStickerContext ? t("stickerProperties") : isVisualContext ? t("visualPanelTitle") : isCaptionContext ? t("caption") : isAudioClipContext ? t("audioClipProperties") : t("aiVoice"));
+  const title = focusedSectionTitle || (isSilenceRemovalContext ? t("pauseTitle") : isPluginsContext ? getPluginCopy(uiLanguage).title : isFaceSwapContext ? t("faceSwapTitle") : isOpticalFlowContext ? t("effectVectorTracking") : isLineArtContext ? t("lineArtTitle") : isCinematicDepthContext ? t(effectsPanelMode === "relight" ? "relightTitle" : effectsPanelMode === "depth-map" ? "depthMapTitle" : "depthTitle") : isPhotoParallaxContext ? t("parallaxTitle") : isEffectsContext ? t("effects") : isAiMusicContext ? (AI_MUSIC_COPY[uiLanguage] || AI_MUSIC_COPY.en).title : isSmartAutoContext ? t("smartAutoEdit") : isSmartFrameContext ? t("smartFrame") : isAvatarContext ? t("avatarTitle") : isVectorOverlay || isVectorVisual ? t("vectorProperties", "矢量图形") : isOverlayContext ? t("pictureInPicture", "画中画") : isStickerContext ? t("stickerProperties") : isVisualContext ? t("visualPanelTitle") : isCaptionContext ? t("caption") : isAudioClipContext ? t("audioClipProperties") : t("aiVoice"));
   const panelStatusText = isSilenceRemovalContext ? t("pauseHint") : isFaceSwapContext
     ? faceSwap?.job?.running ? `${faceSwap.job.progress}%` : hasVisual ? t("smartVisualReady") : t("smartWaitingVisual")
     : isLineArtContext ? t("lineArtPreview")
@@ -1839,6 +1834,7 @@ export function VoicePanel({
             audioEditor={selectedTrackAudioSegment?.embeddedVideo ? <AudioClipContextPanel t={t} language={uiLanguage} visualAssociation={audioVisualAssociation} segment={{ ...selectedTrackAudioSegment, id: selectedTrackAudioSegment.segmentId }} updateAudioSegment={updateSelectedTrackAudioSegment} /> : null}
             t={t}
             segment={selectedVisualSegment}
+            getColorScopeSource={getColorScopeSource}
             localTime={visualLocalTime}
             onChange={updateSelectedVisualEffects}
             onPreviewAnimation={onPreviewAnimation}
@@ -2037,31 +2033,6 @@ export function VoicePanel({
         ) : null}
       </div>
 
-      {audioSegments.map((segment) => (
-        <audio
-          key={`${segment.id}:${segment.url}`}
-          ref={(node) => {
-            if (node) audioSegmentRefs.current.set(segment.id, node);
-            else audioSegmentRefs.current.delete(segment.id);
-            if (segment.id === audioSegments.at(-1)?.id) audioRef.current = node;
-          }}
-          src={segment.url}
-        />
-      ))}
-      {sourceAudioUrl ? (
-        <audio
-          key={sourceAudioUrl}
-          data-track="source-audio"
-          ref={sourceAudioRef}
-          src={sourceAudioUrl}
-        />
-      ) : null}
-      {musicUrl ? (
-        <audio
-          ref={musicRef}
-          src={musicUrl}
-        />
-      ) : null}
     </aside>
   );
 }

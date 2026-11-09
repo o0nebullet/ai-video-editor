@@ -1,3 +1,6 @@
+import { drawTemplateCard, getTemplateCardBox, hasTemplateCardCorners } from "./templateCardProjection.js";
+import { ensureFaceAttachmentAssets } from "./faceAttachmentAssets.js";
+import { drawTrackedFaceAttachments } from "./faceAttachments.js";
 import { normalizeSplitScreenRect } from "./previewAlignment.js";
 import { composeRepairWithWebCodecs } from "./repairVideoComposition.js";
 import { createRepairRangeEncoding } from "./repairRangeEncoding.js";
@@ -12,7 +15,7 @@ const ffmpegCoreURL = import.meta.env.VITE_FFMPEG_CORE_URL || ffmpegCoreURLBundl
 const ffmpegCoreWasmURL = import.meta.env.VITE_FFMPEG_WASM_URL || ffmpegCoreWasmURLBundled;
 
 import { AUDIO_RECORDING_FORMATS, EXPORT_RECORDING_FORMATS, FILTER_OPTIONS } from "../config/editor.js";
-import { throwIfExportAborted, waitForExportTimeout } from "./exportCancellation.js";
+import { createExportAbortError, throwIfExportAborted, waitForExportTimeout } from "./exportCancellation.js";
 import {
   createCaptionSegments,
   getSegmentIndexAtTime,
@@ -32,6 +35,7 @@ import { resolveVisionAnalysisAtTime } from "./vision.js";
 import { getVisualFitRect } from "./visualGeometry.js";
 import { resolveSmartFrameCropAtTime, smartFrameCropToPixels } from "./smartFrame.js";
 import {
+  getTaperedMaskPoints,
   getVisualMaskFeatherPixels,
   getVisualMaskGeometry,
   getVisualPlaybackRateAtTime,
@@ -51,6 +55,8 @@ import { prepareDepthFrame, getDepthFrame, drawCinematicDepthFrame, normalizeCin
 import { drawPhotoParallaxFrame, normalizePhotoParallax } from "./photoParallax.js";
 import { createVideoTrackFrame } from "./videoTrackFrames.js";
 import { composeColorGradeFilter, resolveColorGrade } from "./colorGrade.js";
+import { isMaskTransition, maskTransitionPaths, strokeMaskTransition } from "./maskTransitions.js";
+import { drawTimelineEffects } from "./timelineEffects.js";
 import { normalizeClickRippleEffect, resolveClickRippleState } from "./clickRippleEffect.js";
 
 export function getAudioRecordingFormat() {
@@ -162,20 +168,28 @@ export function getVideoTrackSampleCount(duration, maxFrames = VIDEO_TRACK_FRAME
   return Math.max(1, Math.min(maxFrames, Math.ceil(safeDuration / targetStep)));
 }
 
-export function seekVideoFrame(video, time) {
+export function seekVideoFrame(video, time, tolerance = 0.015, signal) {
   const safeTime = Math.max(0, Math.min(time, Math.max(0, (video.duration || time) - 0.04)));
   return new Promise((resolve, reject) => {
+    throwIfExportAborted(signal);
+    let animationId = 0;
     let callbackId = 0;
     let timeoutId = 0;
     const cleanup = () => {
+      signal?.removeEventListener("abort", abort);
+      if (animationId) window.cancelAnimationFrame(animationId);
       video.removeEventListener("seeked", handleSeeked);
       video.removeEventListener("error", handleError);
       if (callbackId) video.cancelVideoFrameCallback?.(callbackId);
       if (timeoutId) window.clearTimeout(timeoutId);
     };
+    const abort = () => {
+      cleanup();
+      reject(createExportAbortError());
+    };
     const resolvePresentedFrame = () => {
       if (typeof video.requestVideoFrameCallback !== "function") {
-        window.requestAnimationFrame(() => {
+        animationId = window.requestAnimationFrame(() => {
           cleanup();
           resolve(video.currentTime);
         });
@@ -200,12 +214,14 @@ export function seekVideoFrame(video, time) {
       reject(new Error("Video frame seek failed"));
     };
 
+    signal?.addEventListener("abort", abort, { once: true });
     video.addEventListener("seeked", handleSeeked, { once: true });
     video.addEventListener("error", handleError, { once: true });
-    if (video.readyState >= 2 && Math.abs(video.currentTime - safeTime) < 0.015) {
+    if (video.readyState >= 2 && Math.abs(video.currentTime - safeTime) < tolerance) {
       resolvePresentedFrame();
     } else {
-      video.currentTime = safeTime;
+      try { video.currentTime = safeTime; }
+      catch (error) { cleanup(); reject(error); }
     }
   });
 }
@@ -517,37 +533,37 @@ export async function decodeWaveform(blob, barCount = 118, options = {}) {
         throw fallbackError;
       }
     }
-    const channelData = decoded.getChannelData(0);
-    // Keep bounded fine detail for timeline envelopes, even when callers request a legacy strip.
-    barCount = Math.max(barCount, Math.min(8192, Math.max(1024, Math.ceil(decoded.duration * 48))));
-    const blockSize = Math.max(1, Math.floor(channelData.length / barCount));
-    const peaks = Array.from({ length: barCount }, (_, index) => {
-      const start = index * blockSize;
-      let peak = 0;
-      let sumSquares = 0;
-      let samples = 0;
-      for (
-        let cursor = start;
-        cursor < start + blockSize && cursor < channelData.length;
-        cursor += 1
-      ) {
-        const value = Math.abs(channelData[cursor]);
-        peak = Math.max(peak, value);
-        sumSquares += value * value;
-        samples += 1;
-      }
-      const rms = samples ? Math.sqrt(sumSquares / samples) : 0;
-      return rms * 0.78 + peak * 0.22;
-    });
-    const strongest = Math.max(...peaks, 0.001);
-
-    return {
-      duration: decoded.duration,
-      peaks: peaks.map((peak) => Math.max(0.04, Math.min(1, Math.pow(peak / strongest, 0.72)))),
-    };
+    return { duration: decoded.duration, peaks: getAudioWaveformPeaks(decoded.getChannelData(0), decoded.duration, barCount) };
   } finally {
     if (!borrowedAudioContext) await audioContext.close().catch(() => {});
   }
+}
+
+export function getAudioWaveformPeaks(channelData, duration, barCount = 118) {
+  // Keep bounded fine detail for timeline envelopes, even when callers request a legacy strip.
+  barCount = Math.max(barCount, Math.min(8192, Math.max(1024, Math.ceil(duration * 48))));
+  const blockSize = Math.max(1, Math.floor(channelData.length / barCount));
+  const peaks = Array.from({ length: barCount }, (_, index) => {
+    const start = index * blockSize;
+    let peak = 0;
+    let sumSquares = 0;
+    let samples = 0;
+    for (
+      let cursor = start;
+      cursor < start + blockSize && cursor < channelData.length;
+      cursor += 1
+    ) {
+      const value = Math.abs(channelData[cursor]);
+      peak = Math.max(peak, value);
+      sumSquares += value * value;
+      samples += 1;
+    }
+    const rms = samples ? Math.sqrt(sumSquares / samples) : 0;
+    return rms * 0.78 + peak * 0.22;
+  });
+  const strongest = Math.max(...peaks, 0.001);
+
+  return peaks.map((peak) => Math.max(0.04, Math.min(1, Math.pow(peak / strongest, 0.72))));
 }
 
 export function encodeAudioBufferAsWav(buffer) {
@@ -761,15 +777,29 @@ export function createTemporalMaskCache(urls, maxEntries = 8) {
   };
 }
 
-export function loadVideo(src) {
+export function loadVideo(src, { signal } = {}) {
   return new Promise((resolve, reject) => {
+    throwIfExportAborted(signal);
     const video = document.createElement("video");
     video.crossOrigin = "anonymous";
     video.muted = true;
     video.playsInline = true;
     video.preload = "auto";
-    video.onloadedmetadata = () => resolve(video);
-    video.onerror = reject;
+    const cleanup = () => {
+      signal?.removeEventListener("abort", abort);
+      video.onloadedmetadata = null;
+      video.onerror = null;
+    };
+    const fail = (error) => {
+      cleanup();
+      video.removeAttribute("src");
+      video.load();
+      reject(error);
+    };
+    const abort = () => fail(createExportAbortError());
+    video.onloadedmetadata = () => { cleanup(); resolve(video); };
+    video.onerror = fail;
+    signal?.addEventListener("abort", abort, { once: true });
     video.src = src;
   });
 }
@@ -803,6 +833,23 @@ function getVisualEffectsLayers(canvas) {
   return layers;
 }
 
+function traceVisualMask(context, mask, geometry, x = 0, y = 0) {
+  const taper = getTaperedMaskPoints(mask, geometry);
+  context.beginPath();
+  if (taper) {
+    taper.forEach(([px, py], index) => {
+      if (index === 0) context.moveTo(px + x, py + y);
+      else context.lineTo(px + x, py + y);
+    });
+    context.closePath();
+  } else if (mask.type === "circle") {
+    context.arc(x + geometry.centerX, y + geometry.centerY, geometry.radius, 0, Math.PI * 2);
+  } else {
+    context.roundRect(x + geometry.centerX - geometry.width / 2, y + geometry.centerY - geometry.height / 2,
+      geometry.width, geometry.height, geometry.cornerRadius);
+  }
+}
+
 function drawVisualEffectsMask(context, mask, canvas) {
   const geometry = getVisualMaskGeometry(mask, canvas);
   const feather = getVisualMaskFeatherPixels(mask, canvas);
@@ -815,42 +862,32 @@ function drawVisualEffectsMask(context, mask, canvas) {
   }
   context.fillStyle = "#fff";
   context.filter = feather ? `blur(${feather}px)` : "none";
-  context.beginPath();
-  if (mask.type === "circle") {
-    context.arc(geometry.centerX, geometry.centerY, geometry.radius, 0, Math.PI * 2);
-  } else {
-    context.roundRect(
-      geometry.centerX - geometry.width / 2,
-      geometry.centerY - geometry.height / 2,
-      geometry.width,
-      geometry.height,
-      geometry.cornerRadius,
-    );
-  }
+  traceVisualMask(context, mask, geometry);
   context.fill();
   context.restore();
 }
 
-function drawOverlayMaskShape(context, mask, canvas, visual) {
+const projectedOverlayLayers = new WeakMap();
+function getProjectedOverlayLayers(canvas, box) {
+  let layers = projectedOverlayLayers.get(canvas);
+  if (!layers) {
+    layers = { visual: document.createElement("canvas"), mask: document.createElement("canvas") };
+    projectedOverlayLayers.set(canvas, layers);
+  }
+  const width = Math.max(2, Math.round(box.width));
+  const height = Math.max(2, Math.round(box.height));
+  for (const layer of Object.values(layers)) {
+    if (layer.width !== width) layer.width = width;
+    if (layer.height !== height) layer.height = height;
+  }
+  return layers;
+}
+
+function traceOverlayMaskShape(context, mask, canvas, visual) {
   const visualSize = getVisualDimensions(visual);
   const box = getVisualFitRect(visualSize, canvas, "contain");
   const geometry = getVisualMaskGeometry(mask, { width: box.width, height: box.height });
-  const feather = getVisualMaskFeatherPixels(mask, { width: box.width, height: box.height });
-  context.fillStyle = "#fff";
-  context.filter = feather ? `blur(${feather}px)` : "none";
-  context.beginPath();
-  if (mask.type === "circle") {
-    context.arc(box.x + geometry.centerX, box.y + geometry.centerY, geometry.radius, 0, Math.PI * 2);
-  } else {
-    context.roundRect(
-      box.x + geometry.centerX - geometry.width / 2,
-      box.y + geometry.centerY - geometry.height / 2,
-      geometry.width,
-      geometry.height,
-      geometry.cornerRadius,
-    );
-  }
-  context.fill();
+  traceVisualMask(context, mask, geometry, box.x, box.y);
 }
 
 function getMaskedVisualLayer(canvas) {
@@ -1208,7 +1245,7 @@ export function drawPreviewFrame(context, visual, canvas, options) {
     context.rect(primarySplitCell.x * width, primarySplitCell.y * height, primarySplitCell.width * width, primarySplitCell.height * height);
     context.clip();
   }
-  const primaryFitMode = primarySplitCell ? "contain" : fitMode;
+  const primaryFitMode = primarySplitCell ? "contain" : visualEffects?.fitMode || fitMode;
   const subjectEffect = normalizeSubjectEffect(visualEffects?.subjectEffect);
   if (hasSubjectEffect(subjectEffect) && subjectEffect.background.mode === "color") {
     context.save();
@@ -1256,7 +1293,9 @@ export function drawPreviewFrame(context, visual, canvas, options) {
     }
     const smartFrameSourceTime = getVisualSourceTime(visualEffects, visualTime);
     const smartFrameCrop = resolveSmartFrameCropAtTime(visualEffects?.smartFrame, smartFrameSourceTime);
-    return drawFittedVisual(targetContext, visual, targetCanvas, primaryFitMode, primaryFilter, vision, visualEffects?.subjectEffect, smartFrameCrop);
+    const layout = drawFittedVisual(targetContext, visual, targetCanvas, primaryFitMode, primaryFilter, vision, visualEffects?.subjectEffect, smartFrameCrop);
+    drawTrackedFaceAttachments(targetContext,targetCanvas,options.effectClips,options.timelineTime || 0,visualEffects,smartFrameSourceTime,layout);
+    return layout;
   };
   if (usesAlphaMask) {
     const layers = getVisualEffectsLayers(canvas);
@@ -1284,7 +1323,8 @@ export function drawPreviewFrame(context, visual, canvas, options) {
       context.ellipse(maskCenterX, maskCenterY, maskWidth / 2, maskHeight / 2, 0, 0, Math.PI * 2);
       context.clip();
     } else if (["rectangle", "rounded"].includes(mask.type)) {
-      context.beginPath(); context.roundRect(maskCenterX - maskWidth / 2, maskCenterY - maskHeight / 2, maskWidth, maskHeight, mask.type === "rounded" ? Math.min(maskWidth, maskHeight) * (Number.isFinite(mask.cornerRadius) ? mask.cornerRadius : 12) / 100 : 0); context.clip();
+      traceVisualMask(context, mask, getVisualMaskGeometry(mask, canvas));
+      context.clip();
     }
     context.globalAlpha = animatedTransform.opacity;
     context.translate(width / 2 + (animatedTransform.x / 100) * width, height / 2 + (animatedTransform.y / 100) * height);
@@ -1297,16 +1337,20 @@ export function drawPreviewFrame(context, visual, canvas, options) {
 
   drawClickRippleEffect(context, canvas, visualEffects?.clickRipple, visualTime);
 
-  if (transitionNext?.visual && transitionId !== "none" && transitionProgress > 0) {
+  const transitionActive = Boolean(transitionNext?.visual && transitionId !== "none" && transitionProgress > 0);
+  const transitionAboveOverlays = isMaskTransition(transitionId);
+  const paintTransition = () => {
     const amount = Math.max(0, Math.min(1, transitionProgress));
     context.save();
+    const transitionMask = isMaskTransition(transitionId) ? maskTransitionPaths(transitionId, amount, width, height) : null;
+    if (transitionMask) context.clip(new Path2D(transitionMask.path), transitionMask.evenOdd ? "evenodd" : "nonzero");
     if (transitionId === "wipe-left") context.rect(width * (1 - amount), 0, width * amount, height);
     else if (transitionId === "wipe-up") context.rect(0, height * (1 - amount), width, height * amount);
     else if (transitionId === "split") {
       context.rect(width * (0.5 - amount / 2), 0, width * amount, height);
     }
     if (["wipe-left", "wipe-up", "split"].includes(transitionId)) context.clip();
-    context.globalAlpha = transitionId === "flash" ? Math.max(0, (amount - 0.35) / 0.65) : amount;
+    context.globalAlpha = transitionMask ? 1 : transitionId === "flash" ? Math.max(0, (amount - 0.35) / 0.65) : amount;
     if (transitionId === "zoom") {
       const scale = 1.12 - amount * 0.12;
       context.translate(width / 2, height / 2); context.scale(scale, scale); context.translate(-width / 2, -height / 2);
@@ -1318,8 +1362,10 @@ export function drawPreviewFrame(context, visual, canvas, options) {
     const nextFilter = transitionId === "blur" ? `${nextBaseFilter === "none" ? "" : nextBaseFilter} blur(${Math.max(0, (1 - amount) * 14)}px)`.trim() : nextBaseFilter;
     const nextSourceTime = getVisualSourceTime(transitionNext.visualEffects, transitionNext.visualTime || 0);
     const nextSmartFrameCrop = resolveSmartFrameCropAtTime(transitionNext.visualEffects?.smartFrame, nextSourceTime);
-    drawFittedVisual(context, transitionNext.visual, canvas, primaryFitMode, nextFilter, transitionNext.vision || null, null, nextSmartFrameCrop);
+    const nextLayout=drawFittedVisual(context, transitionNext.visual, canvas, (transitionMask && transitionNext.visualEffects?.fitMode) || primaryFitMode, nextFilter, transitionNext.vision || null, null, nextSmartFrameCrop);
+    drawTrackedFaceAttachments(context,canvas,options.effectClips,options.timelineTime || 0,transitionNext.visualEffects,nextSourceTime,nextLayout);
     context.restore();
+    if (transitionMask) strokeMaskTransition(context, transitionMask.edge, width, height);
     if (transitionId === "flash") {
       context.fillStyle = `rgba(255,255,255,${Math.max(0, 1 - Math.abs(amount - 0.5) * 2) * 0.7})`;
       context.fillRect(0, 0, width, height);
@@ -1328,9 +1374,14 @@ export function drawPreviewFrame(context, visual, canvas, options) {
       context.fillStyle = `rgba(53,234,217,${Math.sin(amount * Math.PI * 8) * 0.12})`;
       context.fillRect(0, 0, width, height);
     }
-  }
-
+  };
+  if (transitionActive && !transitionAboveOverlays) paintTransition();
   context.restore();
+
+  drawTimelineEffects(context, canvas, options.effectClips || [], options.timelineTime || 0, drawClickRippleEffect, {
+    markers: options.timelineMarkers, scrubbing: options.scrubbing,
+    referenceSource: { visual, assetId: visualEffects?.assetId },
+  });
 
   visualOverlays.forEach((overlay, index) => {
     const overlayVisual = visualOverlaySources[index];
@@ -1360,6 +1411,29 @@ export function drawPreviewFrame(context, visual, canvas, options) {
       : FILTER_OPTIONS.find((option) => option.id === overlay.filterId)?.css || "none";
     const mask = overlay.mask ?? { type: "none" };
     const hasMask = mask.type && mask.type !== "none";
+    if (hasTemplateCardCorners(overlay.templateCardCorners)) {
+      const box = getTemplateCardBox(height);
+      const layers = getProjectedOverlayLayers(canvas, box);
+      const texture = layers.visual.getContext("2d");
+      texture.clearRect(0, 0, layers.visual.width, layers.visual.height);
+      drawFittedVisual(texture, overlayVisual, layers.visual, "cover", overlayFilter, overlay.vision, overlay.subjectEffect);
+      if (hasMask) {
+        drawVisualEffectsMask(layers.mask.getContext("2d"), mask, layers.mask);
+        texture.save();
+        texture.globalCompositeOperation = "destination-in";
+        texture.drawImage(layers.mask, 0, 0);
+        texture.restore();
+      }
+      drawClickRippleEffect(texture, layers.visual, overlayClickRipple, overlayTime);
+      context.globalAlpha = animatedOverlayTransform.opacity;
+      context.translate(width * (0.5 + animatedOverlayTransform.x / 100), height * (0.5 + animatedOverlayTransform.y / 100));
+      context.rotate((animatedOverlayTransform.rotation * Math.PI) / 180);
+      context.scale(animatedOverlayTransform.scale, animatedOverlayTransform.scale);
+      drawTemplateCard(context, layers.visual, canvas, overlay.templateCardCorners);
+      context.restore();
+      return;
+    }
+    const hardMask = hasMask && !mask.inverted && !(Number(mask.feather) > 0) && !overlayClickRipple.enabled;
     const paintOverlay = (targetContext) => {
       targetContext.save();
       targetContext.globalAlpha = animatedOverlayTransform.opacity * (isVector ? vectorAppearance.opacity : 1);
@@ -1367,6 +1441,10 @@ export function drawPreviewFrame(context, visual, canvas, options) {
       targetContext.rotate((animatedOverlayTransform.rotation * Math.PI) / 180);
       targetContext.scale(animatedOverlayTransform.scale, animatedOverlayTransform.scale);
       targetContext.translate(-width / 2, -height / 2);
+      if (hardMask) {
+        traceOverlayMaskShape(targetContext, mask, canvas, overlayVisual);
+        targetContext.clip();
+      }
       const overlayDepth = normalizeCinematicDepth(overlay.cinematicDepth);
       const overlayParallax = normalizePhotoParallax(overlay.photoParallax);
       if ((overlayParallax.enabled || overlayDepth.enabled) && overlay.depth?.depthVisual) {
@@ -1389,7 +1467,7 @@ export function drawPreviewFrame(context, visual, canvas, options) {
       }
       targetContext.restore();
     };
-    if (hasMask) {
+    if (hasMask && !hardMask) {
       const layers = getVisualEffectsLayers(canvas);
       const layerContext = layers.visual.getContext("2d");
       const maskContext = layers.mask.getContext("2d");
@@ -1415,7 +1493,12 @@ export function drawPreviewFrame(context, visual, canvas, options) {
       maskContext.rotate((animatedOverlayTransform.rotation * Math.PI) / 180);
       maskContext.scale(animatedOverlayTransform.scale, animatedOverlayTransform.scale);
       maskContext.translate(-width / 2, -height / 2);
-      drawOverlayMaskShape(maskContext, mask, canvas, overlayVisual);
+      const box = getVisualFitRect(getVisualDimensions(overlayVisual), canvas, "contain");
+      const feather = getVisualMaskFeatherPixels(mask, box);
+      maskContext.fillStyle = "#fff";
+      maskContext.filter = feather ? `blur(${feather}px)` : "none";
+      traceOverlayMaskShape(maskContext, mask, canvas, overlayVisual);
+      maskContext.fill();
       maskContext.restore();
       layerContext.save();
       layerContext.globalCompositeOperation = "destination-in";
@@ -1449,6 +1532,9 @@ export function drawPreviewFrame(context, visual, canvas, options) {
     }
     context.restore();
   });
+
+  drawTimelineEffects(context, canvas, options.effectClips || [], options.timelineTime || 0, drawClickRippleEffect, { composition: true, markers: options.timelineMarkers, scrubbing: options.scrubbing });
+  if (transitionActive && transitionAboveOverlays) paintTransition();
 
   if (captionsEnabled && subtitle) {
     const captionLayout = getCaptionTextLayout({
@@ -1559,6 +1645,8 @@ function createVideoRecorder(outputStream, {
 }
 
 export async function exportBrowserVideo({
+  effectClips = [],
+  timelineMarkers = [],
   imageSrc,
   visualType,
   visualSegments = [],
@@ -1597,6 +1685,7 @@ export async function exportBrowserVideo({
   timelineOffset = 0,
   captionTargetDuration: providedCaptionTargetDuration = 0,
 }) {
+  await ensureFaceAttachmentAssets(effectClips);
   throwIfExportAborted(signal);
   if (!window.MediaRecorder) {
     throw new Error("当前浏览器不支持 MediaRecorder，无法导出视频。");
@@ -2011,7 +2100,7 @@ export async function exportBrowserVideo({
     const nextVisualItem = transitionDuration > 0 && timelineTime >= transitionStart ? visualItems[visualIndex + 1] : null;
     const transitionProgress = nextVisualItem ? (timelineTime - transitionStart) / transitionDuration : 0;
     if (nextVisualItem?.segment.type === "video") {
-      const nextTime = Math.max(0, Number(nextVisualItem.segment.sourceStart) || 0) + transitionProgress * transitionDuration;
+      const nextTime = getVisualSourceTime(nextVisualItem.segment, isMaskTransition(junction?.id) ? 0 : transitionProgress * transitionDuration);
       if (!nextVisualItem.visual.seeking && Math.abs(nextVisualItem.visual.currentTime - nextTime) > 0.05) nextVisualItem.visual.currentTime = nextTime;
     }
     const resolvedVision = resolveVisionAnalysisAtTime(
@@ -2049,11 +2138,12 @@ export async function exportBrowserVideo({
       transitionNext: nextVisualItem ? {
         visual: nextVisualItem.cutoutVisual || nextVisualItem.visual,
         visualEffects: nextVisualItem.segment,
-        visualTime: transitionProgress * transitionDuration,
+        visualTime: isMaskTransition(junction?.id) ? 0 : transitionProgress * transitionDuration,
       } : null,
       transitionProgress,
       vision: frameVision,
       depth: frameDepth,
+      effectClips, timelineMarkers, timelineTime,
       visualEffects: visualItem.segment,
       visualTime: localTime,
       visualOverlays: renderedVisualOverlays.map(({ segment, renderSegment }) => ({
@@ -2135,6 +2225,7 @@ export async function exportBrowserVideo({
       transitionId,
       vision: finalFrameVision,
       depth: finalFrameDepth,
+      effectClips, timelineMarkers, timelineTime: rangeStart + totalDuration,
       visualEffects: finalVisualItem.segment,
       visualTime: finalLocalTime,
       visualOverlays: finalVisualOverlays.map(({ segment }) => ({

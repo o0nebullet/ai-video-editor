@@ -17,6 +17,7 @@ export function getMobileClipActionIds(track, options = {}) {
       ...(options.isVector ? ["visual-vector"] : ["visual-mask", "visual-filter"]),
       ...(track === "overlay" && !options.isVector ? ["visual-effects"] : []),
       "visual-animation",
+      ...(options.canReplaceVisual ? ["replace-visual"] : []),
       "export-clip",
       ...(!options.isVector && options.isVideo ? ["visual-speed", "audio-properties", "audio-spatial"] : []),
       ...(track === "image" && !options.isVector ? ["visual-repair"] : []),
@@ -55,7 +56,7 @@ export function resolveInspectorPanelContext({ origin = "", activeTool = "", sel
   if (activeTool === "smart") return "smart";
   if (activeTool === "plugins") return "plugins";
   if (activeTool === "effects") return "effects";
-  if (activeTool === "caption") return "caption";
+  if (activeTool === "caption" || selectedTrack === "caption") return "caption";
   if (selectedTrack === "image") return "visual";
   if (selectedTrack === "overlay") return "overlay";
   if (selectedTrack === "sticker") return "sticker";

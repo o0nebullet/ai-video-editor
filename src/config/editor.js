@@ -3,6 +3,8 @@ import {
   ImageSquare,
   MusicNote,
   MagicWand,
+  Layout,
+  Sparkle,
   PlugsConnected,
   Scan,
   Sticker,
@@ -239,7 +241,9 @@ export const TOOL_RAIL = [
   { id: "caption", label: "字幕", icon: ClosedCaptioning },
   { id: "smart", label: "智能", icon: Scan },
   { id: "audio", label: "音频", icon: MusicNote },
-  { id: "effects", label: "特效", icon: MagicWand },
+  { id: "effects", label: "画面处理", icon: MagicWand },
+  { id: "specialEffects", label: "特效", icon: Sparkle },
+  { id: "templates", label: "模板", icon: Layout },
   { id: "plugins", label: "插件", icon: PlugsConnected },
   { id: "stickers", label: "贴纸", icon: Sticker },
 ];
@@ -283,6 +287,10 @@ export const TRANSITIONS = [
   { id: "blur", name: "模糊切" },
   { id: "split", name: "双开门" },
   { id: "glitch", name: "故障闪" },
+  { id: "diagonal-fold", name: "斜向折叠" },
+  { id: "ripple-mask", name: "同心波纹" },
+  { id: "step-mask", name: "阶梯蒙版" },
+  { id: "shutter-mask", name: "双侧快门" },
 ];
 
 export const STICKER_PAGE_SIZE = 9;

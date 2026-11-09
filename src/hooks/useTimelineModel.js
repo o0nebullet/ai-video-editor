@@ -1,3 +1,4 @@
+import { isMaskTransition } from "../lib/maskTransitions.js";
 import { useMemo } from "react";
 
 import {
@@ -113,12 +114,13 @@ export function useTimelineModel(d) {
   const timelineDuration = useMemo(() => Math.min(
         MAX_TIMELINE_DURATION_SECONDS,
         Math.max(
+          ...(d.effectClips || []).map(clip => clip.start + clip.duration),
           markerExtent > 0 ? markerExtent + Math.min(2, getTimelineVisibleDuration(d.timelineZoom) / 10) : 0,
           estimatedDuration > 0 ? d.timelineHorizon : DEFAULT_TIMELINE_DURATION_SECONDS,
           estimatedDuration > 0 ? getTimelineProjectDuration(estimatedDuration) : 0,
           getTimelineVisibleDuration(d.timelineZoom),
         ),
-      ), [estimatedDuration, d.timelineHorizon, d.timelineZoom, markerExtent]);
+      ), [estimatedDuration, d.timelineHorizon, d.timelineZoom, markerExtent, d.effectClips]);
   d.timelineDurationRef.current = timelineDuration;
 
   const currentSegmentIndex = getSegmentIndexAtTime(
@@ -223,7 +225,7 @@ export function useTimelineModel(d) {
     const junction = previewVisualSegment?.transition;
     const next = d.visualSegments[previewVisualSegmentIndex + 1];
     if (!next || !junction?.id || junction.id === "none" || !previewVisualRange) return null;
-    const duration = Math.max(0.1, Math.min(Number(junction.duration) || 0.5, previewVisualSegment.duration || 0.5, next.duration || 0.5));
+    const duration = Math.max(0.1, Math.min(Number(junction.duration) || 0.5, previewVisualSegment.duration || 0.5, isMaskTransition(junction.id) ? Infinity : next.duration || 0.5));
     const start = previewVisualRange.end - duration;
     if (d.currentTime < start || d.currentTime >= previewVisualRange.end) return null;
     return { id: junction.id, duration, progress: (d.currentTime - start) / duration, next };
