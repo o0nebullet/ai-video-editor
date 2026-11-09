@@ -9,6 +9,19 @@ import "./styles.css";
 
 registerModelCacheServiceWorker();
 
+// GitHub Pages khong cap header COOP/COEP: lan tai dau service worker moi
+// dang ky xong thi reload 1 lan de service worker chen header vao response
+// dieu huong (xem withIsolationHeaders trong model-cache-sw.js). Cac host
+// khac da co header san thi crossOriginIsolated = true, khong reload.
+void registerModelCacheServiceWorker().then(() => {
+  if (!window.location.hostname.endsWith(".github.io")) return;
+  if (window.crossOriginIsolated) return;
+  if (!navigator.serviceWorker?.controller) return;
+  if (window.sessionStorage.getItem("timeline-coi-reload")) return;
+  window.sessionStorage.setItem("timeline-coi-reload", "1");
+  window.location.reload();
+});
+
 const rootElement = document.getElementById("root");
 void connectHostSession().then((hostSession) => {
   createRoot(rootElement).render(

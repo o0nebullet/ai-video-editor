@@ -63,6 +63,7 @@ export function mirroredModelFileUrls({
   revision,
   huggingFaceRevision = revision,
   modelScopeRevision = revision,
+  huggingFaceOwner = "haixin",
   path,
   preference,
   modelScopeOwner = MODEL_SCOPE_OWNER,
@@ -72,7 +73,7 @@ export function mirroredModelFileUrls({
     ? preference
     : getModelSourcePreference(preference);
   return orderModelSourceUrls(
-    `https://huggingface.co/haixin/${repository}/resolve/${huggingFaceRevision}${suffix}`,
+    `https://huggingface.co/${huggingFaceOwner}/${repository}/resolve/${huggingFaceRevision}${suffix}`,
     `https://www.modelscope.cn/models/${modelScopeOwner}/${repository}/resolve/${modelScopeRevision}${suffix}`,
     resolvedPreference,
   );
@@ -84,6 +85,7 @@ export async function loadFromMirroredRepository(transformersEnv, {
   revision,
   huggingFaceRevision = revision,
   modelScopeRevision = revision,
+  huggingFaceOwner = "haixin",
   preference,
   modelScopeOwner = MODEL_SCOPE_OWNER,
 }, loader) {
@@ -93,6 +95,7 @@ export async function loadFromMirroredRepository(transformersEnv, {
     repository,
     huggingFaceRevision,
     modelScopeRevision,
+    huggingFaceOwner,
     path: configPath,
     preference,
     modelScopeOwner,

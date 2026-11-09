@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DEFAULT_TRACK_LOCKS, DEFAULT_TRACK_VISIBILITY } from "../lib/projectTrackState.js";
+import { getStoredLanguage } from "../i18n.js";
 
 export function useEditorUiState() {
   const [status, setStatus] = useState("ready");
@@ -20,7 +21,8 @@ export function useEditorUiState() {
   const [activeTool, setActiveTool] = useState("media");
   const [mediaTab, setMediaTab] = useState("upload");
   const [voiceTab, setVoiceTab] = useState("synthesis");
-  const [voiceFilter, setVoiceFilter] = useState("all");
+  // Giao dien tieng Viet -> loc giong doc mac dinh la Tieng Viet (thay Linh truoc).
+  const [voiceFilter, setVoiceFilter] = useState(() => (getStoredLanguage() === "vi" ? "Tiếng Việt" : "all"));
   const [showVoiceFilter, setShowVoiceFilter] = useState(false);
   const [ratioId, setRatioId] = useState("16:9");
   const [showRatioMenu, setShowRatioMenu] = useState(false);

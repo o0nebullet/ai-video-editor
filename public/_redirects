@@ -1,0 +1,4 @@
+/.well-known/*  /agent-protocol-not-found.txt  404
+/.well-known  /agent-protocol-not-found.txt  404
+/auth.md  /agent-protocol-not-found.txt  404
+/*  /index.html  200

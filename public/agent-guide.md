@@ -1,6 +1,6 @@
 # Timeline Studio agent guide
 
-Timeline Studio is a free, open-source, local-first browser video editor. Its canonical root, <https://video-editor.ai-creator.top/>, opens the editor directly.
+Timeline Studio is a free, open-source, local-first browser video editor. Its canonical root, <https://papaya-axolotl-9490bc.netlify.app/>, opens the editor directly.
 
 ## Work with the open browser project
 
@@ -19,11 +19,11 @@ The editor registers structured WebMCP tools when the browser provides a support
 
 The browser tools do not expose arbitrary JavaScript execution, arbitrary URL or filesystem imports, remote generation, media upload, or arbitrary AI model execution. Local AI jobs use the editor’s existing voiceover, transcription and depth-analysis/rendering services; they never insert results into the timeline automatically. Asset insertion uses media already available in the editor. Project saving creates a `.timeline` archive; video export separately renders a finished file through the shared editor pipeline. Export receipts report the actual format and bytes, including a WebM fallback when an MP4 compatibility transcode fails. A triggered browser download is not proof that the host has verified the file on disk.
 
-Use the [browser editing Skill](/.well-known/agent-skills/edit-timeline-studio-browser/SKILL.md) for the tool workflow. Discover the actual page tool schemas for parameters and current availability. The [integration reference](https://github.com/MartinDelophy/ai-video-editor/blob/main/docs/webmcp.md) documents the implementation and supported editing subset.
+Use the [browser editing Skill](/.well-known/agent-skills/edit-timeline-studio-browser/SKILL.md) for the tool workflow. Discover the actual page tool schemas for parameters and current availability. The integration reference documents the implementation and supported editing subset.
 
 ## Work with local project files
 
-The repository also provides a [local editing Skill](https://github.com/MartinDelophy/ai-video-editor/tree/main/skills/edit-timeline-studio), a command runner, and a local STDIO MCP adapter over the shared editing engine. This path operates on local project files and requires the complete repository resources and host dependencies. It is distinct from the live browser tools and is not an HTTP service on this website. Follow the local Skill's setup guidance; reading a public Skill is not permission to install software or download models.
+The repository also provides a local editing Skill, a command runner, and a local STDIO MCP adapter over the shared editing engine. This path operates on local project files and requires the complete repository resources and host dependencies. It is distinct from the live browser tools and is not an HTTP service on this website. Follow the local Skill's setup guidance; reading a public Skill is not permission to install software or download models.
 
 ## Discover and verify instructions
 

@@ -1,8 +1,7 @@
 # Timeline Studio — Full Product Reference
 
 Last verified: 2026-09-10
-Canonical URL: https://video-editor.ai-creator.top/
-GitHub: https://github.com/MartinDelophy/ai-video-editor
+Canonical URL: https://papaya-axolotl-9490bc.netlify.app/
 License: MIT
 
 ## Definition
@@ -109,11 +108,9 @@ Chinese, English, Japanese, Korean, Spanish, French, German, Portuguese, Thai, V
 - Project and video delivery use browser downloads. Asset insertion references media already available in the editor; browser tools expose no arbitrary URL or filesystem import, media upload, arbitrary model execution, remote generation or cloud rendering.
 - The separate repository Skill, CLI and local STDIO MCP operate on project files. The website does not host a remote MCP or OAuth server.
 - Tool results can include project metadata, caption text and explicitly requested rendered media samples, which the browser agent receives under its own data-handling terms. Media bytes are not returned by inspection tools.
-- Browser guide: https://video-editor.ai-creator.top/agent-guide.md
-- Agent Skills index: https://video-editor.ai-creator.top/.well-known/agent-skills/index.json
-- Browser Skill: https://video-editor.ai-creator.top/.well-known/agent-skills/edit-timeline-studio-browser/SKILL.md
-- Full local Skill: https://github.com/MartinDelophy/ai-video-editor/tree/main/skills/edit-timeline-studio
-- Integration reference: https://github.com/MartinDelophy/ai-video-editor/blob/main/docs/webmcp.md
+- Browser guide: https://papaya-axolotl-9490bc.netlify.app/agent-guide.md
+- Agent Skills index: https://papaya-axolotl-9490bc.netlify.app/.well-known/agent-skills/index.json
+- Browser Skill: https://papaya-axolotl-9490bc.netlify.app/.well-known/agent-skills/edit-timeline-studio-browser/SKILL.md
 
 ## Technology
 
@@ -121,18 +118,18 @@ React 19, Vite 6, ONNX Runtime Web, WebAssembly, WebGPU, MediaRecorder, browser 
 
 ## Official factual pages
 
-- https://video-editor.ai-creator.top/features/
-- https://video-editor.ai-creator.top/how-it-works/
-- https://video-editor.ai-creator.top/faq/
-- https://video-editor.ai-creator.top/privacy/
-- https://video-editor.ai-creator.top/about/
-- https://video-editor.ai-creator.top/ai-video-editor/
-- https://video-editor.ai-creator.top/ai-voiceover-generator/
-- https://video-editor.ai-creator.top/automatic-caption-generator/
-- https://video-editor.ai-creator.top/browser-ai-music-generator/
-- https://video-editor.ai-creator.top/local-ai-video-editor/
-- https://video-editor.ai-creator.top/talking-avatar-generator/
-- https://video-editor.ai-creator.top/articles/
+- https://papaya-axolotl-9490bc.netlify.app/features/
+- https://papaya-axolotl-9490bc.netlify.app/how-it-works/
+- https://papaya-axolotl-9490bc.netlify.app/faq/
+- https://papaya-axolotl-9490bc.netlify.app/privacy/
+- https://papaya-axolotl-9490bc.netlify.app/about/
+- https://papaya-axolotl-9490bc.netlify.app/ai-video-editor/
+- https://papaya-axolotl-9490bc.netlify.app/ai-voiceover-generator/
+- https://papaya-axolotl-9490bc.netlify.app/automatic-caption-generator/
+- https://papaya-axolotl-9490bc.netlify.app/browser-ai-music-generator/
+- https://papaya-axolotl-9490bc.netlify.app/local-ai-video-editor/
+- https://papaya-axolotl-9490bc.netlify.app/talking-avatar-generator/
+- https://papaya-axolotl-9490bc.netlify.app/articles/
 
 - WebMCP also supports `relight-analysis` and `depth-map` AI jobs for inspected visual/overlay clips through prepare/start/inspect/cancel. Lighting parameters use reviewed `clip.set_relight` with matching complete analysis; depth videos return My assets IDs before separate reviewed insertion. Source trim/speed mapping, locks, cancellation and stale-source checks use the existing production pipeline. Local CLI/STDIO edits settings only, with browser execution/rendering required for these effects.
 

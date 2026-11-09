@@ -1,22 +1,22 @@
 {
   "name": "web-player",
-  "version": "1.0.0",
+  "version": "1.0.9-ad.1",
   "private": true,
   "description": "A local-first browser AI video editor for WebGPU AI music, AI repair, voiceovers, captions, talking avatars, and deterministic export.",
   "license": "MIT",
-  "homepage": "https://video-editor.ai-creator.top/",
+  "homepage": "https://papaya-axolotl-9490bc.netlify.app/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MartinDelophy/ai-video-editor.git"
+    "url": "https://github.com/o0nebullet/ai-video-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/MartinDelophy/ai-video-editor/issues"
+    "url": "https://github.com/o0nebullet/ai-video-editor/issues"
   },
   "type": "module",
   "scripts": {
     "host": "node apps/launcher/index.ts",
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "node scripts/write-version.mjs && vite build",
     "agent": "node scripts/timeline-command.mjs",
     "mcp": "node skills/edit-timeline-studio/mcp/server.mjs",
     "skill:doctor": "node skills/edit-timeline-studio/scripts/setup-host.mjs --check",

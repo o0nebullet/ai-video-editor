@@ -4,9 +4,15 @@ import { drawTrackedFaceAttachments } from "./faceAttachments.js";
 import { normalizeSplitScreenRect } from "./previewAlignment.js";
 import { composeRepairWithWebCodecs } from "./repairVideoComposition.js";
 import { createRepairRangeEncoding } from "./repairRangeEncoding.js";
-import ffmpegCoreURL from "@ffmpeg/core?url";
-import ffmpegCoreWasmURL from "@ffmpeg/core/wasm?url";
+import ffmpegCoreURLBundled from "@ffmpeg/core?url";
+import ffmpegCoreWasmURLBundled from "@ffmpeg/core/wasm?url";
 import ffmpegClassWorkerURL from "@ffmpeg/ffmpeg/worker?worker&url";
+
+// Cloudflare Pages gioi han 25 MiB/file, con ffmpeg-core wasm 31 MB nen
+// phai de file nay tren R2 va tro URL bang env luc build. Khong co env thi
+// dung ban dong goi san nhu cu, khong doi hanh vi.
+const ffmpegCoreURL = import.meta.env.VITE_FFMPEG_CORE_URL || ffmpegCoreURLBundled;
+const ffmpegCoreWasmURL = import.meta.env.VITE_FFMPEG_WASM_URL || ffmpegCoreWasmURLBundled;
 
 import { AUDIO_RECORDING_FORMATS, EXPORT_RECORDING_FORMATS, FILTER_OPTIONS } from "../config/editor.js";
 import { createExportAbortError, throwIfExportAborted, waitForExportTimeout } from "./exportCancellation.js";

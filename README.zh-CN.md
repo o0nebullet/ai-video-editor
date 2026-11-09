@@ -2,9 +2,9 @@
 
 [English](README.md) | **中文** | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt-BR.md) | [ไทย](README.th.md) | [Tiếng Việt](README.vi.md) | [Русский](README.ru.md)
 
-[![在线体验](https://img.shields.io/badge/在线体验-Timeline_Studio-35ead9?style=flat-square)](https://video-editor.ai-creator.top/)
-[![GitHub Release](https://img.shields.io/github/v/release/MartinDelophy/ai-video-editor?style=flat-square)](https://github.com/MartinDelophy/ai-video-editor/releases)
-[![MIT License](https://img.shields.io/github/license/MartinDelophy/ai-video-editor?style=flat-square)](LICENSE)
+[![在线体验](https://img.shields.io/badge/在线体验-Timeline_Studio-35ead9?style=flat-square)](https://papaya-axolotl-9490bc.netlify.app/)
+[![GitHub Release](https://img.shields.io/github/v/release/MartinDelophy/ai-video-editor?style=flat-square)](https://github.com/o0nebullet/ai-video-editor/releases)
+[![MIT License](https://img.shields.io/github/license/o0nebullet/ai-video-editor?style=flat-square)](LICENSE)
 [![skills.sh](https://skills.sh/b/MartinDelophy/ai-video-editor)](https://skills.sh/MartinDelophy/ai-video-editor)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md) [![LINUX DO](https://shorturl.at/ggSqS)](https://linux.do)
 
@@ -39,7 +39,12 @@ Anna 版将 AI 辅助剪辑与工程续作接入同一体验：
 - **2026-11-07** — 在「特效」后新增「模板」工作区。三分屏卡点可换入自己的图片、视频和可选配乐，调整 BPM 后生成可编辑的时间轴。优化网点和多画面叠加的预览性能。 模板配置移到右侧，内置配乐随 BPM 卡点。主画面和画中画可右键选择「替换片段」，取用新素材指定的时间段并保留原有时间轴位置和时长。 预览会提前解码下一镜和即将入场的画中画，减少接缝处的停顿。 替换片段弹窗显示素材缩略图与文件名，超过四项可拖动自定义横向滚动条，取用区间会实时计算所需倍速。
 - **2026-11-07** — 新增可编辑的三分屏卡点模板和四种可叠加特效：底色闪拍、卡点推拉、网点线描、形状闪光。节奏可跟随固定 BPM 或时间轴标记，闪光可选圆形、星形或横线。
 - **2026-11-07** — 新增独立「特效」工作区，内置 8 个可叠加的画面特效，以及跟随人脸的晶体猫耳和小恶魔。特效可拖到专用轨道、裁剪并设置关键帧；拖动位置对齐弧线可微调佩戴，延长时保留原有追踪。卡片尺寸与「效果」一致，支持悬停预览，预览和导出共用特效数据。 新增「猫脸」：立体猫鼻、细胡须与柔和腮红，复用人脸光流追踪，可与猫耳叠加。 原「效果」入口与面板统一改为「画面处理」，与「特效」明确区分，覆盖全部 13 种界面语言。 编辑器首屏 JS 分包，导出、分析、语音和插件运行时按需加载。
-在公开 [Roadmap](ROADMAP.md) 查看计划与 TODO，在 [Releases](https://github.com/MartinDelophy/ai-video-editor/releases) 查看已发布功能，在 [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) 跟踪具体任务和缺陷。
+- **2026-11-06** — Windows 桌面时间线新增细横向滑轨，可直接拖动查看前后片段。
+- **2026-11-06** — 支持按住 Shift 多选画面片段，显示编号选中标记；右键“导出所选片段”按时间线顺序分别输出带序号的文件，沿用现有导出设置、合成画面和音频时间。
+- **2026-11-06** — 新增主画面及画中画片段右键菜单和手机操作栏的“导出片段”：按片段时间范围导出当前合成画面，复用原片、变速映射、字幕及音频导出流程，支持全部 13 种界面语言。
+- **2026-11-04** — 效果中新增“线稿图”，支持细节、线条粗细、黑白反转与实时预览。图片生成 PNG，视频按当前裁剪和变速映射生成 24 fps WebM 并保留源音频，保存到我的素材后可手动插入；覆盖 13 种语言及手机端。 修复主画面为空、仅有画中画片段时无法播放的问题。
+- **2026-11-03** — 新增桌面端“文件、编辑、片段、视图、帮助”菜单，接入现有剪辑、预览、代理与帮助操作，支持键盘导航及全部 13 种界面语言；手机和平板保留紧凑菜单布局。 修复媒体准备期间的撤销重做、速度曲线切分的源时间保持及分离音频的播放同步。 菜单在展开挂载后再接收键盘焦点，避免打开后焦点丢失。 代理操作统一收进“视图”菜单，显示实际播放来源并提供独立缓存管理；各菜单使用不同功能图标，手机端采用紧凑入口与底部面板，覆盖全部 13 种语言。
+在公开 [Roadmap](ROADMAP.md) 查看计划与 TODO，在 [Releases](https://github.com/o0nebullet/ai-video-editor/releases) 查看已发布功能，在 [Issues](https://github.com/o0nebullet/ai-video-editor/issues) 跟踪具体任务和缺陷。
 
 ## 它能制作什么？
 
@@ -54,7 +59,7 @@ Anna 版将 AI 辅助剪辑与工程续作接入同一体验：
 
 Timeline Studio 是一个本地优先、直接运行在浏览器中的 AI 视频编辑器。它把接近剪映/CapCut 的多轨时间线，与 WebGPU AI 音乐和修复、多语言配音、自动字幕、数字人和确定性离线导出结合在一起。
 
-[打开在线编辑器](https://video-editor.ai-creator.top/) · [观看演示](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[打开在线编辑器](https://papaya-axolotl-9490bc.netlify.app/) · [观看演示](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ## 视频演示
 
@@ -150,14 +155,14 @@ gh skill preview MartinDelophy/ai-video-editor edit-timeline-studio
 - **下一步：** 扩展无头渲染与浏览器导出的能力一致性，增加可审阅的 WebMCP 编辑命令，并让可复用工程模板更易分享。
 - **未来：** 增加协作审阅流程、插件扩展能力，以及更多经过本地验证的 AI 模型。
 
-路线图优先级会在 [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions) 中共同讨论。欢迎提交功能建议和真实工作流反馈。
+路线图优先级会在 [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions) 中共同讨论。欢迎提交功能建议和真实工作流反馈。
 
 ## 期待你的参与
 
 我们正在寻找对浏览器媒体、WebCodecs、WebGPU/ONNX、时间线交互、本地化或文档感兴趣的贡献者。
 
-- 体验[在线编辑器](https://video-editor.ai-creator.top/)，并在 [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) 中提交可复现的问题。
-- 加入 [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions)，提出功能建议、分享作品或帮助确定路线图优先级。
+- 体验[在线编辑器](https://papaya-axolotl-9490bc.netlify.app/)，并在 [Issues](https://github.com/o0nebullet/ai-video-editor/issues) 中提交可复现的问题。
+- 加入 [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions)，提出功能建议、分享作品或帮助确定路线图优先级。
 - 尤其欢迎聚焦的小型修复、翻译、文档和示例项目贡献。
 
 ## 快速启动
@@ -165,7 +170,7 @@ gh skill preview MartinDelophy/ai-video-editor edit-timeline-studio
 建议使用 Node.js 20+ 和现代 Chromium 浏览器；运行大型 AI 模型时推荐 WebGPU。
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -196,7 +201,7 @@ npx netlify-cli deploy --prod --dir=dist
 
 ## 支持与反馈
 
-如果这个项目对你有帮助，欢迎点亮 ⭐ Star；遇到问题请[提交 Issue](https://github.com/MartinDelophy/ai-video-editor/issues)。
+如果这个项目对你有帮助，欢迎点亮 ⭐ Star；遇到问题请[提交 Issue](https://github.com/o0nebullet/ai-video-editor/issues)。
 
 欢迎加入我们的 [Discord 社区](https://discord.gg/uq2uvUTBr)，提问、分享反馈，并与其他用户和贡献者交流。
 

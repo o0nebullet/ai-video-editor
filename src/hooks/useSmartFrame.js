@@ -60,11 +60,11 @@ export function useSmartFrame({
 
   const analyze = useCallback(async () => {
     if (!selectedSegment || !["image", "video"].includes(selectedSegment.type)) {
-      notify?.("请先选择当前图片或视频片段");
+      notify?.("Hãy chọn đoạn ảnh hoặc video hiện tại trước");
       return;
     }
     if (trackLocked) {
-      notify?.("画面轨已锁定，无法应用 Smart Frame");
+      notify?.("Rãnh hình ảnh đã khóa, không áp dụng được Smart Frame");
       return;
     }
     if (job.running) {
@@ -76,7 +76,7 @@ export function useSmartFrame({
     abortRef.current = controller;
     setRatioId(targetRatioId);
     setCompareMode("after");
-    setJob({ running: true, stage: "setup", progress: 1, phase: "准备当前片段" });
+    setJob({ running: true, stage: "setup", progress: 1, phase: "Đang chuẩn bị đoạn hiện tại" });
     const startedAt = performance.now();
     try {
       const track = await analyzeSmartFrameClip({
@@ -93,15 +93,15 @@ export function useSmartFrame({
       const nextDraft = rebuildDraft(track, targetRatioId, settings);
       setAnalysisTrack(track);
       setDraft(nextDraft);
-      setJob({ running: false, stage: "complete", progress: 100, phase: "构图预览已生成", elapsedMs: track.analysisMs });
-      notify?.("Smart Frame 已生成，确认预览后再应用");
+      setJob({ running: false, stage: "complete", progress: 100, phase: "Đã tạo xem trước bố cục", elapsedMs: track.analysisMs });
+      notify?.("Đã tạo Smart Frame, hãy xem trước rồi áp dụng");
     } catch (error) {
       if (error?.name === "AbortError") {
-        setJob({ running: false, stage: "idle", progress: 0, phase: "已取消" });
+        setJob({ running: false, stage: "idle", progress: 0, phase: "Đã hủy" });
         return;
       }
-      setJob({ running: false, stage: "error", progress: 0, phase: error?.message || "Smart Frame 分析失败" });
-      notify?.(error?.message || "Smart Frame 分析失败，请重试");
+      setJob({ running: false, stage: "error", progress: 0, phase: error?.message || "Phân tích Smart Frame thất bại" });
+      notify?.(error?.message || "Phân tích Smart Frame thất bại, hãy thử lại");
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
     }
@@ -130,7 +130,7 @@ export function useSmartFrame({
     setBaseline(applied);
     setDraft(applied);
     setCompareMode("after");
-    notify?.("Smart Frame 已应用到当前片段");
+    notify?.("Đã áp dụng Smart Frame cho đoạn hiện tại");
   }, [draft, notify, selectedSegment?.id, setVisualSegments, trackLocked]);
 
   const cancel = useCallback(() => {
@@ -143,7 +143,7 @@ export function useSmartFrame({
     setRatioId(baseline?.targetRatio || startingRatioRef.current || ratioId);
     setCompareMode(baseline ? "after" : "original");
     setJob({ running: false, stage: "idle", progress: 0, phase: "" });
-    notify?.("已取消本次 Smart Frame 调整");
+    notify?.("Đã hủy lần chỉnh Smart Frame này");
   }, [baseline, notify, ratioId, setRatioId]);
 
   const remove = useCallback(() => {

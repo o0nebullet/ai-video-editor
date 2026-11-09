@@ -5,9 +5,9 @@ description: Use native WebMCP tools to edit the project open in Timeline Studio
 
 # Edit the open Timeline Studio project
 
-Use this skill for the user's live project at [Timeline Studio](https://video-editor.ai-creator.top/). Discover actual page tool schemas through the user's browser host. WebMCP is experimental and requires a compatible browser and host; this document is guidance, not a callable service.
+Use this skill for the user's live project at [Timeline Studio](https://papaya-axolotl-9490bc.netlify.app/). Discover actual page tool schemas through the user's browser host. WebMCP is experimental and requires a compatible browser and host; this document is guidance, not a callable service.
 
-If page tools are unavailable, use authorized browser controls or the [repository's local editing Skill](https://github.com/MartinDelophy/ai-video-editor/tree/main/skills/edit-timeline-studio) when working with local project files. The local route requires its complete repository resources and host dependencies. Downloading this browser Skill does not install a CLI or grant permission to install software. No hosted HTTP MCP endpoint or OAuth service is provided.
+If page tools are unavailable, use authorized browser controls or the repository's local editing Skill when working with local project files. The local route requires its complete repository resources and host dependencies. Downloading this browser Skill does not install a CLI or grant permission to install software. No hosted HTTP MCP endpoint or OAuth service is provided.
 
 ## Inspect and plan
 
@@ -57,7 +57,7 @@ Chinese and mixed Chinese/English narration uses the two built-in Hojo voices. T
 
 Export uses the real editor pipeline and shared progress/cancel UI. MOV requires the deterministic pipeline. Browser cancellation cannot retract an already-triggered download; a late cancellation may return a succeeded task. Export receipts are page-session data: the latest 64 jobs remain inspectable, with bounded retry-key history. Do not invent success from a job ID or restart with a new request key merely because a response is uncertain.
 
-The tool surface exposes no arbitrary JavaScript, arbitrary URL import, filesystem access, arbitrary AI/model execution, remote generation or cloud rendering. Browser agents receive metadata, caption text, and explicitly requested media samples under their own data-handling terms; ordinary inspection remains metadata-only and does not create an upload service. More detailed operation and export examples are in the [integration reference](https://github.com/MartinDelophy/ai-video-editor/blob/main/docs/webmcp.md).
+The tool surface exposes no arbitrary JavaScript, arbitrary URL import, filesystem access, arbitrary AI/model execution, remote generation or cloud rendering. Browser agents receive metadata, caption text, and explicitly requested media samples under their own data-handling terms; ordinary inspection remains metadata-only and does not create an upload service. More detailed operation and export examples are in the integration reference.
 
 ## Relighting and depth video
 

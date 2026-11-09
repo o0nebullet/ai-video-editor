@@ -36,7 +36,12 @@ Anna 版では、AI による編集支援とプロジェクトの継続を利用
 - **2026-11-07** — 特殊効果の次にテンプレートを追加。3分割モンタージュに画像・動画・任意の音楽を入れ、テンポを調整して編集可能なタイムラインに追加できます。網点と複数パネルのプレビューを高速化しました。 テンプレート設定は右側に移動し、内蔵の音楽は BPM に同期します。メイン映像やピクチャーインピクチャーを右クリックし、元の位置と長さを保ったまま指定した素材の区間に差し替えられます。 次のカットとピクチャーインピクチャーを事前にデコードして、切り替え時のプレビューを滑らかにしました。 差し替え画面にはサムネイルとファイル名が並び、素材が4件を超える場合は横スクロールバーが表示されます。選択範囲に必要な再生速度も確認できます。
 - **2026-11-07** — 編集できる3分割ビート編集と、重ねて使える背景ビートフラッシュ、ビートズーム、網点インク、図形フラッシュを追加。固定テンポまたはタイムラインマーカーに同期でき、フラッシュは円・星・横線から選べます。
 - **2026-11-07** — 重ねられる8種の画面エフェクトと、顔を追跡するクリスタル猫耳・ルビーの角を専用パネルに追加。専用トラックでドラッグ、トリミング、キーフレーム編集ができます。弧をドラッグして装着位置を調整でき、延長しても既存の追跡は保持されます。カードサイズは既存のエフェクトと統一し、ホバーでプレビューでき、書き出しにも反映されます。 猫鼻・ひげ・柔らかなチークの「猫フェイス」を追加。同じ光学フロー追跡を使い、猫耳と重ねて使えます。 従来のエフェクト入口とパネルを「映像処理」に改名し、特別な視覚効果と区別。全13言語に対応しました。 起動時の JavaScript を分割し、書き出し、解析、音声合成、コネクターは必要時に読み込みます。
-計画中の作業は [Roadmap](ROADMAP.md)、公開済みの変更は [Releases](https://github.com/MartinDelophy/ai-video-editor/releases)、個別タスクは [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) を参照してください。
+- **2026-11-06** — Windows デスクトップのタイムラインに細い横スクロールバーを追加。ドラッグして前後のクリップを表示できます。
+- **2026-11-06** — Shiftクリックの複数選択に番号付きマークを追加。右クリックで各選択クリップを時間順の個別ファイルへ書き出し、既存の設定と音声同期を保持します。
+- **2026-11-06** — 主画面とオーバーレイの右クリックメニューおよびモバイル操作にクリップ書き出しを追加。元メディア、速度変換、字幕と音声を保持し、クリップの時間範囲を書き出します。全13言語に対応。
+- **2026-11-04** — エフェクトに線画を追加。細部・線の太さ・白黒反転とプレビューに対応。画像はPNG、動画はトリミングと速度を反映した音声付き24 fps WebMとしてマイ素材に保存し、自動挿入しません。13言語とモバイルに対応。 主映像が空でピクチャーインピクチャーのみのタイムラインも再生可能に修正。
+- **2026-11-03** — デスクトップにファイル・編集・クリップ・表示・ヘルプメニューを追加。既存の編集、プレビュー、プロキシ、ヘルプ操作と連携し、キーボード操作と全13言語に対応。スマートフォンとタブレットはコンパクトなメニューを維持します。 メディア準備中の取り消し・やり直し、速度カーブ分割時のソース時間保持、分離音声の再生同期を修正しました。 メニュー表示後にキーボードフォーカスを設定し、フォーカスの取りこぼしを防ぎます。 プロキシ操作を表示メニューに集約。実際の再生元と独立したキャッシュ管理、各項目の専用アイコン、全13言語対応のモバイルパネルを追加しました。
+計画中の作業は [Roadmap](ROADMAP.md)、公開済みの変更は [Releases](https://github.com/o0nebullet/ai-video-editor/releases)、個別タスクは [Issues](https://github.com/o0nebullet/ai-video-editor/issues) を参照してください。
 
 ## 何を制作できますか？
 
@@ -51,7 +56,7 @@ Anna 版では、AI による編集支援とプロジェクトの継続を利用
 
 Timeline Studio はブラウザで動作するローカルファーストの AI 動画エディターです。CapCut のようなマルチトラックタイムラインに、AI 音声、字幕自動生成、画像解析、トーキングアバター、決定論的なオフライン書き出しを統合しています。
 
-[エディターを開く](https://video-editor.ai-creator.top/) · [デモを見る](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[エディターを開く](https://papaya-axolotl-9490bc.netlify.app/) · [デモを見る](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ![Timeline Studio エディター](docs/screenshots/editor-timeline.png)
 
@@ -96,18 +101,18 @@ gh skill install MartinDelophy/ai-video-editor edit-timeline-studio --agent code
 - **次：** ヘッドレス描画とブラウザ出力の対応範囲を広げ、確認可能な WebMCP 編集コマンドと共有しやすいプロジェクトテンプレートを充実させます。
 - **将来：** 共同レビュー、プラグイン拡張基盤、ローカルで検証済みの AI モデルの追加。
 
-優先順位は [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions) で話し合います。
+優先順位は [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions) で話し合います。
 
 ## コントリビューター募集
 
-ブラウザメディア、WebCodecs、WebGPU/ONNX、タイムライン UX、翻訳、テスト、ドキュメントへの協力を歓迎します。再現可能な不具合は [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) へ、提案や作品は [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions) へお寄せください。小さな修正、テスト、翻訳、サンプルも歓迎します。
+ブラウザメディア、WebCodecs、WebGPU/ONNX、タイムライン UX、翻訳、テスト、ドキュメントへの協力を歓迎します。再現可能な不具合は [Issues](https://github.com/o0nebullet/ai-video-editor/issues) へ、提案や作品は [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions) へお寄せください。小さな修正、テスト、翻訳、サンプルも歓迎します。
 
 ## クイックスタート
 
 Node.js 20+ と最新の Chromium ブラウザが必要です。WebGPU を推奨します。
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -122,7 +127,7 @@ npm run check
 
 ## サポートとフィードバック
 
-このプロジェクトが役に立ったら、ぜひ ⭐ Star をお願いします。問題が発生した場合は、[Issue を作成してください](https://github.com/MartinDelophy/ai-video-editor/issues)。
+このプロジェクトが役に立ったら、ぜひ ⭐ Star をお願いします。問題が発生した場合は、[Issue を作成してください](https://github.com/o0nebullet/ai-video-editor/issues)。
 
 質問やフィードバックの共有、ほかのユーザーやコントリビューターとの交流には、[Discord コミュニティ](https://discord.gg/uq2uvUTBr)へご参加ください。
 

@@ -36,7 +36,12 @@ El usuario será el único responsable de cualquier consecuencia legal derivada 
 - **2026-11-07** — Añadimos Plantillas después de Efectos especiales. Usa tus imágenes, vídeos y música opcional en el montaje editable de tres paneles y ajusta el tempo antes de añadirlo a la línea de tiempo. Mejoramos la fluidez de la trama y de los paneles en la vista previa. Los ajustes de la plantilla están en el panel derecho y la música incluida sigue el BPM. Haz clic derecho en un clip principal o superpuesto para sustituirlo por un intervalo elegido sin cambiar su posición ni duración. La vista previa decodifica con antelación el siguiente plano y los clips superpuestos para suavizar los cortes. El cuadro de sustitución muestra miniaturas y nombres, una barra horizontal a partir de cinco elementos y la velocidad necesaria para ajustar el intervalo seleccionado.
 - **2026-11-07** — Añadimos un montaje rítmico editable de tres paneles y cuatro efectos combinables: destello de fondo, zoom al ritmo, trama de tinta y destello con forma. El ritmo puede seguir un tempo fijo o los marcadores; el destello puede ser un círculo, una estrella o una línea horizontal.
 - **2026-11-07** — Nuevo espacio de efectos especiales con ocho efectos de imagen combinables, orejas de cristal y cuernos de rubí que siguen el rostro. Arrastra, recorta y anima los efectos con fotogramas clave en pistas propias. Arrastra los arcos para ajustar la posición; al alargar un efecto se conserva el seguimiento existente. Las tarjetas mantienen el tamaño del catálogo de efectos y la vista previa coincide con la exportación. Nuevo maquillaje de gato con nariz, bigotes y rubor suave; comparte el seguimiento facial y se combina con las orejas. La entrada y el panel de procesamiento se llaman Imagen y vídeo en los 13 idiomas, separados claramente de los efectos especiales. El JavaScript inicial se divide y los módulos de exportación, análisis, voz y conectores se cargan cuando hacen falta.
-Consulta el [Roadmap](ROADMAP.md) para el trabajo planificado, [Releases](https://github.com/MartinDelophy/ai-video-editor/releases) para los cambios publicados e [Issues](https://github.com/MartinDelophy/ai-video-editor/issues) para tareas y errores.
+- **2026-11-06** — Añadida una barra horizontal fina que se puede arrastrar en la línea de tiempo de Windows.
+- **2026-11-06** — Selección múltiple con Mayús y marcadores numerados; el menú contextual exporta cada clip seleccionado a un archivo independiente en orden, conservando ajustes y sincronía de audio.
+- **2026-11-06** — Se añadió la exportación de clips a los menús de Visuales y Superposición y a las acciones móviles, conservando originales, cambios de velocidad, subtítulos y audio en el intervalo del clip. Disponible en los 13 idiomas.
+- **2026-11-04** — Añadido Dibujo lineal en Efectos, con detalle, grosor, inversión y vista previa. Guarda imágenes PNG y vídeos WebM a 24 fps con recorte, velocidad y audio de origen en Mis recursos, sin inserción automática. Compatible con 13 idiomas y móviles. Corregida la reproducción de líneas de tiempo con solo clips de imagen en imagen.
+- **2026-11-03** — Añadidos menús de escritorio Archivo, Editar, Clip, Ver y Ayuda, conectados a las acciones existentes de edición, vista previa, proxies y ayuda, con navegación por teclado y los 13 idiomas. Móviles y tabletas conservan los menús compactos. Corregidos deshacer/rehacer durante la preparación, los tiempos fuente al dividir curvas de velocidad y la sincronización del audio separado. El foco del teclado se asigna tras montar el menú desplegable. Los controles de proxy pasan a Ver, con origen real de reproducción, gestión de caché separada, iconos distintos por acción y panel móvil en los 13 idiomas.
+Consulta el [Roadmap](ROADMAP.md) para el trabajo planificado, [Releases](https://github.com/o0nebullet/ai-video-editor/releases) para los cambios publicados e [Issues](https://github.com/o0nebullet/ai-video-editor/issues) para tareas y errores.
 
 ## ¿Qué puede producir?
 
@@ -51,7 +56,7 @@ Explora ejemplos reproducibles de antes y después, y recetas de edición:
 
 Timeline Studio es un editor de vídeo con IA, local y ejecutado en el navegador. Combina una línea de tiempo multipista al estilo CapCut con locuciones de IA, subtítulos automáticos, herramientas de visión, avatares parlantes y exportación offline determinista.
 
-[Abrir el editor](https://video-editor.ai-creator.top/) · [Ver la demo](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
+[Abrir el editor](https://papaya-axolotl-9490bc.netlify.app/) · [Ver la demo](https://www.youtube.com/watch?v=chdRPG2ndMs) · [Hugging Face Space](https://huggingface.co/spaces/haixin/timeline-studio)
 
 ![Editor Timeline Studio](docs/screenshots/editor-timeline.png)
 
@@ -96,18 +101,18 @@ Añade `--pin v1.0.8` para instalar la versión verificada en lugar de seguir la
 - **Después:** ampliar la paridad del renderizado headless, los comandos WebMCP revisables y el intercambio de plantillas reutilizables.
 - **Más adelante:** añadir revisión colaborativa, una interfaz de extensiones y más modelos de IA verificados localmente.
 
-Las prioridades se deciden en [GitHub Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions).
+Las prioridades se deciden en [GitHub Discussions](https://github.com/o0nebullet/ai-video-editor/discussions).
 
 ## Se busca ayuda
 
-Buscamos contribuciones sobre medios en el navegador, WebCodecs, WebGPU/ONNX, UX de la línea de tiempo, localización, pruebas y documentación. Informa de errores reproducibles en [Issues](https://github.com/MartinDelophy/ai-video-editor/issues), comparte ideas en [Discussions](https://github.com/MartinDelophy/ai-video-editor/discussions) o aporta correcciones, pruebas, traducciones y ejemplos concretos.
+Buscamos contribuciones sobre medios en el navegador, WebCodecs, WebGPU/ONNX, UX de la línea de tiempo, localización, pruebas y documentación. Informa de errores reproducibles en [Issues](https://github.com/o0nebullet/ai-video-editor/issues), comparte ideas en [Discussions](https://github.com/o0nebullet/ai-video-editor/discussions) o aporta correcciones, pruebas, traducciones y ejemplos concretos.
 
 ## Inicio rápido
 
 Requiere Node.js 20+ y un navegador Chromium moderno. Se recomienda WebGPU.
 
 ```bash
-git clone https://github.com/MartinDelophy/ai-video-editor.git
+git clone https://github.com/o0nebullet/ai-video-editor.git
 cd ai-video-editor
 npm install
 npm run dev
@@ -122,7 +127,7 @@ npm run check
 
 ## Apoyo y comentarios
 
-Si este proyecto te resulta útil, considera darle una ⭐ Star. Si encuentras algún problema, [abre un Issue](https://github.com/MartinDelophy/ai-video-editor/issues).
+Si este proyecto te resulta útil, considera darle una ⭐ Star. Si encuentras algún problema, [abre un Issue](https://github.com/o0nebullet/ai-video-editor/issues).
 
 Únete a nuestra [comunidad de Discord](https://discord.gg/uq2uvUTBr) para hacer preguntas, compartir comentarios y conectar con otros usuarios y colaboradores.
 

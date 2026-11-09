@@ -1,7 +1,7 @@
 import {
   fetchFirstAvailableModel,
 } from "./modelSources.js";
-import { loadVoiceModelFromMirrors, voiceModelFileUrls } from "../config/voiceModels.js";
+import { loadVoiceModelFromMirrors, voiceModelFileUrls, MMS_VOICE_MODEL_HUGGING_FACE_OWNER, MMS_VOICE_MODEL_HUGGING_FACE_REVISION } from "../config/voiceModels.js";
 import { prepareVoiceModelStorage } from "./voiceModelStorage.js";
 
 const MMS_MODEL_BY_VOICE = {
@@ -47,7 +47,10 @@ export async function predictMmsVoice(input, onProgress) {
           if (!String(event?.file || "").endsWith(".onnx")) return;
           if (Number.isFinite(event?.progress)) onProgress?.({ ...event, progress: 10 + Math.max(0, Math.min(100, event.progress)) * 0.76 });
         },
-      }));
+      }), undefined, {
+        huggingFaceOwner: MMS_VOICE_MODEL_HUGGING_FACE_OWNER,
+        huggingFaceRevision: MMS_VOICE_MODEL_HUGGING_FACE_REVISION,
+      });
     })().catch((error) => { runtimePromises.delete(modelId); throw error; }));
   }
   const synthesizer = await runtimePromises.get(modelId);

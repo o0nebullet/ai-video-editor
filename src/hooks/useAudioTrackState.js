@@ -1,9 +1,20 @@
 import { useCallback, useRef, useState } from "react";
 
 import { DEFAULT_TIMELINE_DURATION_SECONDS, VOICES } from "../config/editor.js";
+import { getStoredLanguage } from "../i18n.js";
+
+// Giao dien tieng Viet -> mac dinh giong doc tieng Viet (Linh).
+// Chi la gia tri khoi tao phien lam viec; mo project khac se ghi de.
+function defaultVoiceId() {
+  if (getStoredLanguage() === "vi") {
+    const vietnamese = VOICES.find((voice) => voice.id === "vi_VN-mms-medium");
+    if (vietnamese) return vietnamese.id;
+  }
+  return VOICES[0].id;
+}
 
 export function useAudioTrackState() {
-  const [selectedVoiceId, setSelectedVoiceId] = useState(VOICES[0].id);
+  const [selectedVoiceId, setSelectedVoiceId] = useState(defaultVoiceId);
   const [speed, setSpeed] = useState(VOICES[0].defaultSpeed ?? 1);
   const [volume, setVolume] = useState(1);
   const [audioSegments, setAudioSegmentsState] = useState([]);
