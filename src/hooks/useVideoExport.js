@@ -1,3 +1,5 @@
+import { isFaceEffect, faceAnalysisKey } from "../lib/faceAttachmentAnalysis.js";
+import { faceEffectCopy } from "../i18nFaceEffects.js";
 import { useCallback } from "react";
 import { ensureCaptionFontLoaded, resolveCaptionStyleForSegment } from "../lib/captionFonts.js";
 import { isExportAbortError, throwIfExportAborted } from "../lib/exportCancellation.js";
@@ -10,8 +12,6 @@ import {
   sanitizeExportFileName,
 } from "../lib/exportSettings.js";
 import { downloadBlob, exportBrowserVideo, transcodeWebmToMp4 } from "../lib/media.js";
-import { exportOfflineVideo } from "../lib/offlineVideoExport.js";
-import { prepareEditorComposition } from "../lib/editorComposition.js";
 import { exportAudioMix } from "../lib/audioExport.js";
 import { serializeSrt } from "../lib/subtitles.js";
 import {
@@ -54,6 +54,27 @@ export function useVideoExport(d) {
     const notify = (message) => {
       if (!options.suppressNotification) d.notify(message);
     };
+    const fullDuration = getExportContentDuration({
+      visualDuration: d.imageDuration,
+      voiceDuration: d.voiceTrackDuration,
+      captionDuration: d.captionDuration,
+      sourceAudioDuration: d.sourceAudioBlob ? d.sourceAudioTimelineEnd : 0,
+      musicDuration: d.musicBlob ? d.musicTimelineEnd : 0,
+      stickerDuration: d.stickerDuration,
+      overlaySegments: d.visualOverlaySegments,
+    });
+    const exportRange = getExportRange(exportSettings, fullDuration);
+    if (!audioOnly && d.trackVisibility.effects !== false && (d.effectClips || []).some((clip) =>
+      isFaceEffect(clip) && !clip.hidden &&
+      clip.start < Math.min(exportRange.end, d.imageDuration) &&
+      clip.start + clip.duration > exportRange.start &&
+      (!clip.faceAnalysis?.complete ||
+        clip.faceAnalysis.key !== faceAnalysisKey(clip, d.renderedVisualSegments))
+    )) {
+      const error = faceEffectCopy(d.language).waitExport;
+      notify(error);
+      return { status: "blocked", error };
+    }
     const controller = new AbortController();
     d.exportAbortControllerRef.current = controller;
     const { signal } = controller;
@@ -102,16 +123,6 @@ export function useVideoExport(d) {
         )));
         throwIfExportAborted(signal);
       }
-      const fullDuration = getExportContentDuration({
-        visualDuration: d.imageDuration,
-        voiceDuration: d.voiceTrackDuration,
-        captionDuration: d.captionDuration,
-        sourceAudioDuration: d.sourceAudioBlob ? d.sourceAudioTimelineEnd : 0,
-        musicDuration: d.musicBlob ? d.musicTimelineEnd : 0,
-        stickerDuration: d.stickerDuration,
-        overlaySegments: d.visualOverlaySegments,
-      });
-      const exportRange = getExportRange(exportSettings, fullDuration);
       if (exportRange.duration < 1 / Math.max(24, Number(exportSettings.frameRate) || 30)) {
         throw new Error(localize("exportRangeInvalid"));
       }
@@ -147,6 +158,8 @@ export function useVideoExport(d) {
         }
         return { fileName, extension, byteSize: blob.size, mimeType: blob.type, sidecars };
       };
+      const { prepareEditorComposition } = await import("../lib/editorComposition.js");
+      throwIfExportAborted(signal);
       const exportOptions = await prepareEditorComposition(d, {
         exportSettings, exportRange, exportAudio, burnCaptions, signal, onProgress: progress,
       });
@@ -177,6 +190,7 @@ export function useVideoExport(d) {
         video = await exportBrowserVideo(exportOptions);
         actualPipeline = "compatible";
       } else try {
+        const { exportOfflineVideo } = await import("../lib/offlineVideoExport.js");
         video = await exportOfflineVideo(exportOptions);
         actualPipeline = "deterministic";
       } catch (offlineError) {

@@ -1,3 +1,5 @@
+import { referenceEffectsCopy } from "../i18nReferenceTemplates.js";
+import { isMaskTransition } from "../lib/maskTransitions.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -17,6 +19,7 @@ import {
   Eye,
   EyeSlash,
   FileArrowDown,
+  Swap,
   LockKey,
   LockKeyOpen,
   LinkBreak,
@@ -41,6 +44,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 
+import { replacementCopy } from "../i18nVisualReplacement.js";
 import { IMAGE_SEGMENT_SECONDS, MAX_TIMELINE_DURATION_SECONDS, TRANSITIONS } from "../config/editor.js";
 import { formatClock, formatCompactDuration, formatTime, getSegmentStartTime, getVisualSegmentStartTime, packCaptionSegmentsIntoLanes, packTimedSegmentsIntoLanes } from "../lib/timeline.js";
 import {
@@ -92,7 +96,12 @@ import { TimelineAudioClip, TimelineCaptionClip } from "./TimelineClips.jsx";
 import { TimelineMarkerRail, TimelineMarkerToolbar } from "./TimelineMarkers.jsx";
 import { useTimelineMarkers } from "../hooks/useTimelineMarkers.js";
 import { useTimelinePlayhead } from "../hooks/useTimelinePlayhead.js";
+import { TimelineEffectLane } from "./TimelineEffects.jsx";
+import { packEffectLanes, EFFECT_ASSET_DRAG_EVENT } from "../lib/timelineEffects.js";
+import { SPECIAL_EFFECTS_LABELS } from "../i18nEffectClips.js";
 import { PLAYBACK_UI_FRAME_MS } from "../lib/editorRuntime.js";
+
+import { VisualClipKeyframes } from "./VisualClipKeyframes.jsx";
 
 const TIMELINE_WHEEL_ZOOM_SENSITIVITY = 0.00056;
 const TIMELINE_WHEEL_ZOOM_COMMIT_DELAY = 180;
@@ -104,6 +113,7 @@ const VIDEO_THUMBNAIL_DISPLAY_MAX_COUNT = 480;
 const IMAGE_THUMBNAIL_TARGET_WIDTH = 84;
 const IMAGE_THUMBNAIL_MAX_COUNT = 240;
 const TIMELINE_WHEEL_ZOOM_CONTENT_SELECTOR = [
+  ".timeline-effect-clip",
   ".image-clip",
   ".visual-overlay-clip",
   ".caption-segment",
@@ -209,11 +219,15 @@ function getImageTimelineThumbnailCount({ duration, timelineDuration, contentWid
 }
 
 export function Timeline({
+  playheadRevealRequest,
+  canReplaceVisual,
+  onReplaceVisual,
   exportClip,
   exportSelectedClips,
   exporting = false,
   t,
   audioProcessingLabel,
+  effectClips = [], setEffectClips, selectedEffectClipId, onSelectEffectClip, effectLanguage,
   timelineMarkers = [],
   setTimelineMarkers,
   trOption,
@@ -254,6 +268,7 @@ export function Timeline({
   toggleTrackLock,
   trackScrollRef,
   startTimelineSeek,
+  onMoveVisualKeyframe,
   timelineDuration,
   timelineContentDuration = timelineDuration,
   setTimelineHorizon,
@@ -843,6 +858,17 @@ export function Timeline({
     if (except !== "source") setSelectedSourceAudioSegmentId("");
     if (except !== "music") setSelectedMusicSegmentId?.("");
   };
+  const keyframeActions = useRef(null);
+  keyframeActions.current = {
+    select(track, id) {
+      clearClipSelections(track === "image" ? "visual" : "overlay");
+      if (track === "image") setSelectedVisualSegmentId(id);
+      else setSelectedVisualOverlayId?.(id);
+      setSelectedTrack(track);
+    },
+    seek: seekTo,
+    move: onMoveVisualKeyframe,
+  };
   const clearTimelineClipFocus = () => {
     clearClipSelections();
     setTimelineRangeSelection(new Set());
@@ -911,6 +937,7 @@ export function Timeline({
     && (selectedMobileClipTrack === "overlay" || !Number.isFinite(selectedMobileExtractableVideo.sourceAudioOffset));
   const mobileClipActionIds = getMobileClipActionIds(selectedMobileClipTrack, {
     canExtractSourceAudio: canExtractSelectedMobileSourceAudio,
+    canReplaceVisual: selectedMobileExtractableVideo && canReplaceVisual?.(selectedMobileClipTrack, selectedMobileExtractableVideo.id),
     hasLinkedCaption: selectedMobileHasLinkedCaption,
     isVideo: (selectedMobileVisualSegment || selectedMobileOverlaySegment)?.type === "video",
     isVector: (selectedMobileVisualSegment || selectedMobileOverlaySegment)?.kind === "vector"
@@ -1115,10 +1142,22 @@ export function Timeline({
     () => packCaptionSegmentsIntoLanes(displayedCaptionSegments, displayedCaptionTimeline),
     [displayedCaptionSegments, displayedCaptionTimeline],
   );
+  const [effectDragPreview, setEffectDragPreview] = useState(null);
+  const [effectAssetDragging, setEffectAssetDragging] = useState(false);
+  useEffect(() => {
+    const update=event=>{setEffectAssetDragging(event.detail || "");if(!event.detail)setEffectDragPreview(null);};
+    window.addEventListener(EFFECT_ASSET_DRAG_EVENT,update);
+    return ()=>window.removeEventListener(EFFECT_ASSET_DRAG_EVENT,update);
+  },[]);
+  const effectLanes = packEffectLanes(effectClips);
+  const occupiedEffectClips=effectLanes.flat();
+  const effectLaneCount=effectLanes.length;
+  if(effectAssetDragging || effectDragPreview?.id) effectLanes.push([]);
   const contentRows = [
     displayedVisualSegments.some((item) => item.type === "video") ? "var(--timeline-visual-row-height, 80px)" : TIMELINE_TRACK_ROW_HEIGHT,
     ...overlayLanes.map((lane) => lane.some((item) => item.type === "video") ? "var(--timeline-visual-row-height, 80px)" : TIMELINE_TRACK_ROW_HEIGHT),
     ...(showStickerTrack ? stickerLanes.map(() => TIMELINE_TRACK_ROW_HEIGHT) : []),
+    ...effectLanes.map(() => TIMELINE_TRACK_ROW_HEIGHT),
     ...captionLanes.map(() => TIMELINE_TRACK_ROW_HEIGHT),
     ...(showSourceTrack ? [TIMELINE_TRACK_ROW_HEIGHT] : []),
     ...audioLanes.map(() => TIMELINE_TRACK_ROW_HEIGHT),
@@ -1126,10 +1165,12 @@ export function Timeline({
   ];
   const timelineTrackRows = contentRows.join(" ");
   const timelineLabelRows = contentRows.join(" ");
+  const effectTrackName = SPECIAL_EFFECTS_LABELS[effectLanguage] || SPECIAL_EFFECTS_LABELS.en;
   const timelineTrackLabels = [
     ["image", t("imageTrack")],
     ...overlayLanes.map((_, index) => ["overlay", `${t("overlayTrack", "Overlay")} ${index + 1}`, `overlay-${index}`, `overlay-${index}`]),
     ...(showStickerTrack ? stickerLanes.map((_, index) => ["sticker", `${t("stickerTrack")} ${index + 1}`, `sticker-${index}`]) : []),
+    ...effectLanes.map((_, index) => ["effects", `${effectTrackName} ${index + 1}`, `effects-${index}`, "effects", "effects"]),
     ...captionLanes.map((_, index) => ["caption", `${t("caption")} ${index + 1}`, `caption-${index}`, `caption-${index}`]),
     ...(showSourceTrack ? [["source", t("sourceTrack")]] : []),
     ...audioLanes.map((_, index) => ["audio", `${t("voiceTrack")} ${index + 1}`, `audio-${index}`, `audio-${index}`, `audio-${index}`]),
@@ -1393,7 +1434,7 @@ export function Timeline({
   progressiveFilmstripStateRef.current = { currentTime, displayedVisualSegments, renderedVisualTimeline };
   const [trimScaleLock, setTrimScaleLock] = useState(null);
   const trimScaleLockRef = useRef(null);
-  const trimScrollSeekGuardUntilRef = useRef(0);
+  const mobileScrollSeekGuardUntilRef = useRef(0);
   const mobileRulerSchemeRef = useRef(null);
   const timelineZoomRef = useRef(timelineZoom);
   const wheelZoomFrameRef = useRef(0);
@@ -1404,9 +1445,13 @@ export function Timeline({
   const rulerViewportSyncRef = useRef(null);
   const rulerViewportRef = useRef(null);
   const rulerCanvasRef = useRef(null);
+  useLayoutEffect(() => {
+    if (playheadRevealRequest) mobileScrollSeekGuardUntilRef.current = performance.now() + 80;
+  }, [playheadRevealRequest]);
   const { playheadRef, rulerPlayheadRef, suspendPlayheadFollow, returnToPlayhead, showReturnToPlayhead } = useTimelinePlayhead({
     currentTime, currentTimeRef, isPlaying, timelineDuration, playbackDuration,
     visualPlaybackStartTimeRef, visualPlaybackStartedAtRef, trackScrollRef, rulerCanvasRef,
+    revealRequest: playheadRevealRequest,
   });
   const zoomReadoutRef = useRef(null);
   const pendingWheelDeltaRef = useRef(0);
@@ -1432,13 +1477,13 @@ export function Timeline({
       if (!(pixelsPerSecond > 0) || !(visibleDuration > 0)) return;
       const lock = { pixelsPerSecond, visibleDuration };
       trimScaleLockRef.current = lock;
-      trimScrollSeekGuardUntilRef.current = Number.POSITIVE_INFINITY;
+      mobileScrollSeekGuardUntilRef.current = Number.POSITIVE_INFINITY;
       mobileRulerSchemeRef.current = null;
       setTrimScaleLock(lock);
     };
     const endTrimScaleLock = () => {
       trimScaleLockRef.current = null;
-      trimScrollSeekGuardUntilRef.current = performance.now() + 80;
+      mobileScrollSeekGuardUntilRef.current = performance.now() + 80;
       setTrimScaleLock(null);
     };
     window.addEventListener(TIMELINE_TRIM_SCALE_START_EVENT, startTrimScaleLock);
@@ -1464,7 +1509,7 @@ export function Timeline({
       const state = mobileTimelineStateRef.current;
       if (
         trimScaleLockRef.current
-        || performance.now() < trimScrollSeekGuardUntilRef.current
+        || performance.now() < mobileScrollSeekGuardUntilRef.current
         || !window.matchMedia?.("(max-width: 760px)").matches
         || state?.isPlaying
         || state?.timelineDuration <= 0
@@ -2842,6 +2887,8 @@ export function Timeline({
           {segment.type === "video" && !segment.audioSeparated ? <VideoClipAudio segment={segment} disabled={trackLocks.overlay || !isOverlayLaneVisible(lane)} muted={segment.muted} t={t} onChange={(volume) => setVisualOverlaySegments((items) => items.map((item) => item.id === segment.id ? { ...item, volume } : item))} /> : null}
           <span className={segment.type === "video" ? "video-clip-name" : undefined}>{segment.name || t("overlayTrack", "Overlay")}</span>
           {segment.type === "video" ? <span className="image-clip-duration">{formatClock(segment.duration)}</span> : null}
+          <VisualClipKeyframes keyframes={segment.keyframes} duration={segment.duration} label={t("visualKeyframes")}
+            id={segment.id} track="overlay" start={segment.start} locked={isTimelineRowLocked("overlay", `overlay-${laneIndex}`)} actions={keyframeActions} />
           {renderExportSelectionBadge("overlay", segment.id)}
           <i className="visual-overlay-resize is-start" onPointerDown={(event) => startOverlayEdit(event, "resize-start")} />
           <i className="visual-overlay-resize is-end" onPointerDown={(event) => startOverlayEdit(event, "resize-end")} />
@@ -3190,8 +3237,8 @@ export function Timeline({
               >
                 {rowLocked ? <LockKey size={15} /> : <LockKeyOpen size={15} />}
               </button>
-              <button className="track-name-button" type="button" disabled={!rowVisible} onClick={() => setSelectedTrack(track)}>
-                {label}
+              <button className="track-name-button" type="button" title={label} disabled={!rowVisible} onClick={() => setSelectedTrack(track)}>
+                <span>{label}</span>
               </button>
               </div>
             );
@@ -3411,7 +3458,11 @@ export function Timeline({
                             ))}
                           </span>
                         ) : null}
-                        {!segment.preparing ? <span className="image-clip-duration">{formatClock(segment.duration)}</span> : null}
+                        {!segment.preparing ? <>
+                          <span className="image-clip-duration">{formatClock(segment.duration)}</span>
+                          <VisualClipKeyframes keyframes={segment.keyframes} duration={segment.duration} label={t("visualKeyframes")}
+                            id={segment.id} track="image" start={segmentRange?.start ?? 0} locked={trackLocks.image} actions={keyframeActions} />
+                        </> : null}
                         {!segment.preparing && activeFineEdit?.index === index ? (
                           <span className="fine-edit-readout">
                             {t(activeFineEdit.mode === "slip" ? "timelineSlip" : "timelineSlide", activeFineEdit.mode === "slip" ? "滑移" : "滑动")}
@@ -3479,7 +3530,7 @@ export function Timeline({
                     className={`visual-junction ${transition.id !== "none" ? "has-transition" : ""}`}
                     key={`junction-${segment.id}`}
                     type="button"
-                    aria-label={`${t("transition")}: ${trOption(TRANSITIONS.find((item) => item.id === transition.id)?.name || "无转场")}`}
+                    aria-label={`${t("transition")}: ${referenceEffectsCopy(effectLanguage)[transition.id] || trOption(TRANSITIONS.find((item) => item.id === transition.id)?.name || "无转场")}`}
                     title={t("transitionSettings")}
                     style={{ left: `${(((range?.end || 0) + insertionPreviewOffset) / Math.max(0.01, timelineDuration)) * 100}%` }}
                     onPointerDown={(event) => event.stopPropagation()}
@@ -3496,6 +3547,7 @@ export function Timeline({
             </div>
             {overlayLanes.map((lane, laneIndex) => renderOverlayTrack(lane, laneIndex))}
             {showStickerTrack ? stickerLanes.map((lane, laneIndex) => renderStickerTrack(lane, laneIndex)) : null}
+            {effectLanes.map((lane,index) => <TimelineEffectLane key={`effects-${index}`} clips={lane} allClips={occupiedEffectClips} laneIndex={index} laneCount={effectLaneCount} assetEffect={effectAssetDragging} sharedPreview={effectDragPreview} onDragPreview={setEffectDragPreview} setClips={setEffectClips} duration={timelineDuration} language={effectLanguage} selectedId={selectedEffectClipId} onSelect={onSelectEffectClip} locked={trackLocks.effects} hidden={!isRowVisible("effects")} snapPoints={collectTimelineSnapPoints({timelineDuration,currentTime,visualSegments:displayedVisualSegments,visualOverlaySegments,timelineMarkers,captionSegments:displayedCaptionSegments,stickerSegments,audioSegments})} setSnapGuide={setSnapGuide} setTimelineHorizon={setTimelineHorizon} pauseForEdit={() => { if(isPlaying) handlePlayToggle(); }} />)}
             {captionLanes.map((lane, laneIndex) => (
               <div
                 className={`caption-track ${selectedTrack === "caption" ? "is-selected" : ""} ${
@@ -3766,6 +3818,7 @@ export function Timeline({
             if (actionId === "audio-spatial") return <button type="button" key={actionId} onClick={() => openSelectedClipInspector("spatial")}><Waveform size={20} /><span>{t("audioSpaceTab")}</span></button>;
             if (actionId === "audio-processing") return <button type="button" key={actionId} onClick={() => openSelectedClipInspector("processing")}><SlidersHorizontal size={20} /><span>{audioProcessingLabel}</span></button>;
             if (actionId === "audio-voice-color") return <button type="button" key={actionId} onClick={() => openSelectedClipInspector("voice-color")}><Sparkle size={20} weight="fill" /><span>{t("voiceColorTab", "音色")}</span></button>;
+            if (actionId === "replace-visual") return <button type="button" key={actionId} onClick={() => runMobileClipAction(() => onReplaceVisual?.(selectedMobileClipTrack, selectedMobileExtractableVideo?.id))}><Swap size={20} /><span>{replacementCopy(effectLanguage).title}</span></button>;
             if (actionId === "export-clip") return <button type="button" key={actionId} disabled={exporting} title={t("exportClipHint")} onClick={() => runMobileClipAction(() => exportClip?.(selectedMobileClipTrack, (selectedMobileVisualSegment || selectedMobileOverlaySegment)?.id))}><FileArrowDown size={20} /><span>{t("exportClip")}</span></button>;
             if (actionId === "split") return <button type="button" key={actionId} onClick={() => runMobileClipAction(handleCutTrack)}><Scissors size={20} /><span>{t("mobileClipSplit")}</span></button>;
             if (actionId === "copy") return <button type="button" key={actionId} onClick={() => runMobileClipAction(handleDuplicateTrack)}><CopySimple size={20} /><span>{t("mobileClipCopy")}</span></button>;
@@ -3785,6 +3838,13 @@ export function Timeline({
           <button type="button" role="menuitem" onClick={() => runContextAction(() => openTrackPanel(contextMenu.track))}><SlidersHorizontal size={16} />{t("openTrackPanel")}</button>
           {contextMenu.kind === "clip" ? (
             <>
+              {(contextImageSegment || contextOverlaySegment) && onReplaceVisual ? (
+                <button type="button" role="menuitem"
+                  disabled={!canReplaceVisual?.(contextMenu.track, contextMenu.segmentId)}
+                  onClick={() => runContextAction(() => onReplaceVisual(contextMenu.track, contextMenu.segmentId))}>
+                  <Swap size={16} />{replacementCopy(effectLanguage).title}
+                </button>
+              ) : null}
               {contextMenu.track === "caption" ? (
                 <><button type="button" role="menuitem" onClick={() => runContextAction(() => {
                   openTrackPanel("caption");
@@ -3846,14 +3906,15 @@ export function Timeline({
       {transitionEditor ? (() => {
         const segment = displayedVisualSegments[transitionEditor.index];
         const transition = segment?.transition || { id: "none", duration: 0.5 };
-        const maxDuration = Math.max(0.1, Math.min(2, (segment?.duration || 0.5) / 2, (displayedVisualSegments[transitionEditor.index + 1]?.duration || 0.5) / 2));
+        const maxDuration = isMaskTransition(transition.id) ? Math.max(0.1, segment?.duration || 0.5)
+          : Math.max(0.1, Math.min(2, (segment?.duration || 0.5) / 2, (displayedVisualSegments[transitionEditor.index + 1]?.duration || 0.5) / 2));
         return (
           <div className="transition-popover" role="dialog" aria-label={t("transitionSettings")} style={{ left: transitionEditor.x, top: transitionEditor.y }} onPointerDown={(event) => event.stopPropagation()}>
             <div className="transition-popover-head"><strong>{t("transition")}</strong><button type="button" onClick={() => setTransitionEditor(null)} aria-label={t("close")}><X size={17} /></button></div>
             <div className="transition-presets">
               {TRANSITIONS.map((option) => (
                 <button type="button" className={transition.id === option.id ? "is-selected" : ""} key={option.id} onClick={() => updateJunctionTransition(transitionEditor.index, { id: option.id })}>
-                  <i className={`transition-preview preview-${option.id}`} /><span>{trOption(option.name, option)}</span>
+                  <i className={`transition-preview preview-${option.id}`} /><span>{referenceEffectsCopy(effectLanguage)[option.id] || trOption(option.name, option)}</span>
                 </button>
               ))}
             </div>

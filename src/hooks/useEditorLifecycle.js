@@ -5,6 +5,7 @@ import { disposeVisionWorker } from "../lib/vision.js";
 import { disposeVocalSeparationWorker } from "../lib/vocalSeparation.js";
 import {
   getNearestRatioIdForSize,
+  getAutoRatioSourceKey,
   revokeVisionObjectUrls,
 } from "../lib/editorRuntime.js";
 import { ensureUniqueVisualSegmentIds } from "../lib/timeline.js";
@@ -25,7 +26,7 @@ export function useEditorLifecycle(d) {
       d.autoRatioSourceKeyRef.current = "";
       return;
     }
-    const sourceKey = `${ratioSource.assetId || ratioSource.id}:${ratioSource.width}x${ratioSource.height}`;
+    const sourceKey = getAutoRatioSourceKey(d.visualSegments);
     if (d.autoRatioSourceKeyRef.current === sourceKey) return;
     d.autoRatioSourceKeyRef.current = sourceKey;
     const nextRatioId = getNearestRatioIdForSize(ratioSource.width, ratioSource.height);
@@ -79,6 +80,7 @@ export function useEditorLifecycle(d) {
         (event.key !== "Delete" && event.key !== "Backspace")
       ) return;
       const hasSelectedTimelineItem =
+        (d.selectedTrack === "effects" && d.effectClips?.some(item => item.id === d.selectedEffectClipId)) ||
         (d.selectedTrack === "caption" && d.selectedSegmentId && d.captionSegments.some((segment) => segment.id === d.selectedSegmentId)) ||
         (d.selectedTrack === "sticker" && d.selectedStickerSegmentId && d.stickerSegments.some((segment) => segment.id === d.selectedStickerSegmentId)) ||
         (d.selectedTrack === "image" && d.selectedVisualSegmentId && d.visualSegments.some((segment) => segment.id === d.selectedVisualSegmentId)) ||

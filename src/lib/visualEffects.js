@@ -146,6 +146,24 @@ export function normalizeVisualKeyframes(keyframes = []) {
     }, []);
 }
 
+export function clampVisualKeyframeTime(frames, index, value, duration) {
+  const time = frames[index].time;
+  const gap = KEYFRAME_TIME_TOLERANCE + 0.001;
+  const min = Math.min(time, Math.max(0, (frames[index - 1]?.time ?? -gap) + gap));
+  const max = Math.max(time, Math.min(duration, (frames[index + 1]?.time ?? duration + gap) - gap));
+  return Math.max(min, Math.min(max, Math.round(value * 1000) / 1000));
+}
+
+export function moveVisualKeyframe(keyframes, from, to, duration) {
+  const frames = normalizeVisualKeyframes(keyframes);
+  const index = frames.findIndex((frame) => frame.time === from);
+  if (index < 0) return keyframes;
+  const time = clampVisualKeyframeTime(frames, index, to, duration);
+  if (time === from) return keyframes;
+  frames[index] = { ...frames[index], time };
+  return frames;
+}
+
 export function resolveVisualTransform(keyframes = [], time = 0, baseTransform = DEFAULT_TRANSFORM) {
   const safeTime = Math.max(0, Number(time) || 0);
   const normalizedKeyframes = normalizeVisualKeyframes(keyframes);
@@ -294,6 +312,18 @@ export function getVisualMaskGeometry(mask = {}, frame = {}) {
   return { centerX, centerY, width, height, radius: 0, cornerRadius };
 }
 
+// Taper is an optional signed proportion of the rectangle height. The
+// alternating sides of the staggered collage use the same path in DOM and export.
+export function getTaperedMaskPoints(mask, { centerX, centerY, width, height }) {
+  const taper = Number(mask.taper);
+  if (mask.type !== "rectangle" || !Number.isFinite(taper) || !taper) return null;
+  const inset = Math.min(0.3, Math.abs(taper)) * height;
+  const left = centerX - width / 2, right = centerX + width / 2;
+  const top = centerY - height / 2, bottom = centerY + height / 2;
+  const a = taper < 0 ? inset : 0, b = taper > 0 ? inset : 0;
+  return [[left, top + a], [right, top + b], [right, bottom - b], [left, bottom - a]];
+}
+
 export function getVisualMaskFeatherPixels(mask = {}, frame = {}) {
   if (!mask.type || mask.type === "none") return 0;
   const geometry = getVisualMaskGeometry(mask, frame);
@@ -309,7 +339,9 @@ export function getVisualMaskSvgDataUrl(mask = {}, frame = {}) {
   if (!feather && !mask.inverted) return "";
   const x = geometry.centerX - geometry.width / 2;
   const y = geometry.centerY - geometry.height / 2;
-  const shape = mask.type === "circle"
+  const points = getTaperedMaskPoints(mask, geometry);
+  const shape = points ? `<polygon points="${points.map((point) => point.join(",")).join(" ")}" fill="${mask.inverted ? "black" : "white"}"${feather ? ' filter="url(#blur)"' : ""}/>`
+    : mask.type === "circle"
     ? `<circle cx="${geometry.centerX}" cy="${geometry.centerY}" r="${geometry.radius}" fill="${mask.inverted ? "black" : "white"}"${feather ? ' filter="url(#blur)"' : ""}/>`
     : `<rect x="${x}" y="${y}" width="${geometry.width}" height="${geometry.height}" rx="${geometry.cornerRadius}" fill="${mask.inverted ? "black" : "white"}"${feather ? ' filter="url(#blur)"' : ""}/>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><defs>${feather ? `<filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${feather}"/></filter>` : ""}<mask id="mask" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}"><rect width="${width}" height="${height}" fill="${mask.inverted ? "white" : "black"}"/>${shape}</mask></defs><rect width="${width}" height="${height}" fill="white" mask="url(#mask)"/></svg>`;
